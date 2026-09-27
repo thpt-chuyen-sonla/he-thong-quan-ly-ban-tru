@@ -90,13 +90,13 @@
         }
     </style>
 </head>
-<body class="flex flex-col md:flex-row h-[100dvh] overflow-y-auto md:overflow-hidden text-slate-800">
+<body class="flex flex-col xl:flex-row min-h-[100dvh] xl:h-[100dvh] overflow-x-hidden overflow-y-auto xl:overflow-hidden text-slate-800 bg-slate-50">
 
     <!-- Overlay dùng cho drawer trên di động/tablet -->
     <div id="drawer-overlay" onclick="closeAllDrawers()" class="fixed inset-0 bg-slate-900/50 z-30 hidden lg:hidden"></div>
 
     <!-- LEFT MENU: Dashboard & Weeks -->
-    <aside class="w-full md:w-72 bg-white border-b md:border-b-0 md:border-r border-slate-200 flex flex-col shrink-0 h-[250px] md:h-full z-10 shadow-sm">
+    <aside class="w-full xl:w-72 bg-white border-b xl:border-b-0 xl:border-r border-slate-200 flex flex-col shrink-0 h-[280px] xl:h-full z-10 shadow-sm">
         <div class="p-4 border-b border-slate-200 bg-indigo-600 text-white flex justify-between items-center">
             <h2 class="font-bold text-lg"><i class="fa-solid fa-calendar-days mr-2"></i>Bảng Điều Khiển</h2>
             <button onclick="closeAllDrawers()" class="lg:hidden text-white/80 hover:text-white w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 transition-colors" title="Đóng">
@@ -123,7 +123,7 @@
     </aside>
 
     <!-- CENTER: Main Board -->
-    <main class="flex-1 w-full flex flex-col shrink-0 min-h-[500px] md:min-h-0 md:h-full bg-slate-50/50 relative">
+    <main class="flex-1 w-full flex flex-col shrink-0 min-h-[600px] xl:min-h-0 xl:h-full bg-slate-50/50 relative">
         <!-- Header -->
         <header class="min-h-[4rem] border-b border-slate-200 bg-white flex flex-wrap items-center justify-between gap-y-2 gap-x-3 px-3 sm:px-6 py-2.5 shadow-sm">
             <div class="flex items-center gap-1.5 sm:gap-3 min-w-0">
@@ -176,7 +176,7 @@
     </main>
 
     <!-- RIGHT MENU: Summary & Stats Dashboard -->
-    <aside class="w-full xl:w-[24rem] bg-white border-t md:border-t-0 md:border-l border-slate-200 flex flex-col shrink-0 min-h-[400px] md:h-full shadow-sm z-10">
+    <aside class="w-full xl:w-[24rem] bg-white border-t xl:border-t-0 xl:border-l border-slate-200 flex flex-col shrink-0 h-[450px] xl:h-full shadow-sm z-10">
         <!-- Header Panel -->
         <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between gap-2">
             <button onclick="closeAllDrawers()" class="lg:hidden text-slate-500 hover:text-red-500 w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 transition-colors flex-shrink-0" title="Đóng">

@@ -30,17 +30,14 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html, body {
-  height: 100%; /* Bắt buộc để iOS hiểu giới hạn cuộn */
-}
-body {
-  font-family: 'Be Vietnam Pro', sans-serif;
-  background: var(--cream);
-  color: var(--text);
-  /* XÓA DÒNG min-height: 100vh; đi */
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
+  body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
   }
 
   /* HEADER */
@@ -85,12 +82,14 @@ body {
 
   /* SIDEBAR */
   .sidebar {
-  width: var(--sidebar-w);
-  background: var(--navy-light);
-  flex-shrink: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* KÍCH HOẠT VUỐT iOS */
-  /* các code khác giữ nguyên... */
+    width: var(--sidebar-w);
+    background: var(--navy-light);
+    flex-shrink: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+    z-index: 100;
   }
   .sidebar::-webkit-scrollbar { width: 4px; }
   .sidebar::-webkit-scrollbar-thumb { background: #3a4f72; border-radius: 4px; }
@@ -136,11 +135,11 @@ body {
 
   /* MAIN CONTENT */
   .main {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* KÍCH HOẠT VUỐT iOS */
-  padding: 24px;
-  /* các code khác giữ nguyên... */
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    background: var(--cream);
+    width: 100%;
   }
 
   .page { display: none; }
