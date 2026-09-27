@@ -10,66 +10,76 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
         body {
-            height: 100dvh; /* Chiều cao an toàn của Safari */
-            width: 100vw;
-            overflow: hidden;
-            background-color: #1e1e2f;
+            height: 100dvh; width: 100vw; overflow: hidden; 
+            background-color: #f3f4f6;
             display: flex;
+            flex-direction: column; /* Xếp dọc: Menu trên, App dưới */
         }
 
-        /* Thanh điều hướng Máy tính (Bên trái) */
-        .platform-sidebar {
-            width: 250px; height: 100%; background-color: #1e1e2f; color: white;
-            display: flex; flex-direction: column; z-index: 1000;
+        /* === THANH MENU NẰM NGANG TRÊN CÙNG (DÀNH CHO MÁY TÍNH) === */
+        .platform-topbar {
+            width: 100%; height: 50px; background-color: #1e1e2f; color: white;
+            display: flex; align-items: center; z-index: 1000;
+            padding: 0 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            flex-shrink: 0;
         }
+
         .platform-logo {
-            padding: 20px; font-size: 18px; font-weight: bold; border-bottom: 1px solid #2a2a40;
-            display: flex; align-items: center; gap: 10px; color: #4ade80;
+            font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px; color: #4ade80;
+            margin-right: 40px; /* Cách xa các nút menu ra một chút */
         }
-        .platform-menu { display: flex; flex-direction: column; padding: 15px 0; flex: 1; }
-        .menu-item {
-            padding: 15px 20px; color: #a0a0b0; text-decoration: none; display: flex;
-            align-items: center; gap: 15px; cursor: pointer; transition: all 0.3s;
-            border-left: 4px solid transparent;
-        }
-        .menu-item:hover { background-color: #2a2a40; color: white; }
-        .menu-item.active { background-color: #2a2a40; color: white; border-left-color: #4ade80; font-weight: 600; }
-        .platform-footer { padding: 20px; font-size: 12px; color: #6a6a80; border-top: 1px solid #2a2a40; text-align: center; }
 
-        /* Khung chứa ứng dụng Máy tính */
+        .platform-menu { display: flex; flex-direction: row; height: 100%; }
+
+        .menu-item {
+            padding: 0 20px; color: #a0a0b0; text-decoration: none; display: flex;
+            align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s;
+            border-bottom: 3px solid transparent; /* Đổi viền sang dưới đáy */
+            font-size: 14px;
+        }
+
+        .menu-item:hover { background-color: #2a2a40; color: white; }
+
+        .menu-item.active { 
+            background-color: #2a2a40; color: white; border-bottom-color: #4ade80; font-weight: 600; 
+        }
+
+        .platform-footer { margin-left: auto; font-size: 12px; color: #6a6a80; }
+
+        /* Khung chứa ứng dụng */
         .platform-content {
-            flex: 1; height: 100%; position: relative; background-color: #f3f4f6;
+            flex: 1; width: 100%; position: relative; background-color: #f3f4f6;
         }
+
         .app-frame {
-            width: 100%; height: 100%; border: none; position: absolute;
-            top: 0; left: 0; display: none;
+            width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; display: none;
         }
+        
         .app-frame.active { display: block; }
 
-        /* === TỐI ƯU RIÊNG CHO ĐIỆN THOẠI === */
+        /* === TỐI ƯU RIÊNG CHO ĐIỆN THOẠI (MENU NHẢY XUỐNG ĐÁY) === */
         @media (max-width: 768px) {
             body { display: block; }
             
-            /* Khung ứng dụng bị ép ngắn lại, nhường chỗ cho Menu đáy */
             .platform-content {
-                width: 100%; 
                 height: calc(100dvh - 65px - env(safe-area-inset-bottom)); 
                 position: absolute; top: 0; left: 0;
             }
 
-            /* Menu đóng đinh dưới đáy */
-            .platform-sidebar {
+            .platform-topbar {
                 position: fixed; bottom: 0; left: 0; width: 100%; 
                 height: calc(65px + env(safe-area-inset-bottom));
-                padding-bottom: env(safe-area-inset-bottom);
-                flex-direction: row; box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
+                padding: 0 0 env(safe-area-inset-bottom) 0;
+                justify-content: center; box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
             }
+
             .platform-logo, .platform-footer { display: none; }
-            .platform-menu { flex-direction: row; padding: 0; width: 100%; }
+            .platform-menu { width: 100%; justify-content: space-around; }
+
             .menu-item {
                 flex-direction: column; gap: 4px; padding: 8px; font-size: 11px;
-                border-left: none; border-top: 3px solid transparent; flex: 1; 
-                text-align: center; justify-content: center; height: 100%;
+                border-bottom: none; border-top: 3px solid transparent; flex: 1; 
+                text-align: center; justify-content: center;
             }
             .menu-item i { font-size: 18px; margin-bottom: 2px; }
             .menu-item.active { border-top-color: #4ade80; background-color: rgba(255,255,255,0.05); }
@@ -77,8 +87,10 @@
     </style>
 </head>
 <body>
-    <nav class="platform-sidebar">
+    <!-- THANH NỀN TẢNG ĐÃ ĐƯỢC ĐƯA LÊN TRÊN CÙNG -->
+    <nav class="platform-topbar">
         <div class="platform-logo"><i class="fa-solid fa-school"></i> Hệ sinh thái Bán trú</div>
+        
         <div class="platform-menu">
             <div class="menu-item active" onclick="switchApp('app-quan-ly', this)">
                 <i class="fa-solid fa-users"></i><span>Quản lý Học sinh</span>
@@ -87,9 +99,11 @@
                 <i class="fa-solid fa-calendar-alt"></i><span>Phân công Lịch trực</span>
             </div>
         </div>
-        <div class="platform-footer">THPT Chuyên Sơn La<br>Năm học 2026-2027</div>
+
+        <div class="platform-footer">THPT Chuyên Sơn La</div>
     </nav>
 
+    <!-- NƠI HIỂN THỊ 2 PHẦN MỀM CỦA BẠN -->
     <main class="platform-content">
         <iframe src="quan-ly.html" id="app-quan-ly" class="app-frame active"></iframe>
         <iframe src="xep-lich.html" id="app-xep-lich" class="app-frame"></iframe>
