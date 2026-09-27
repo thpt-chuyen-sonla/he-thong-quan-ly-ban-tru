@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Bán Trú THPT Chuyên Sơn La 2026-2027</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --navy: #1a2744;
+    --navy-light: #243258;
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --cream: #f7f5f0;
+    --white: #ffffff;
+    --red: #c0392b;
+    --red-light: #fdf0ef;
+    --orange: #e67e22;
+    --orange-light: #fef3e8;
+    --green: #27ae60;
+    --green-light: #eafaf1;
+    --gray: #8a9ab5;
+    --gray-light: #eef1f7;
+    --text: #1e2a3a;
+    --text-muted: #6b7a8d;
+    --sidebar-w: 260px;
+    --border: #dde3ef;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .app-header {
+    background: var(--navy);
+    color: white;
+    padding: 0 24px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+    border-bottom: 3px solid var(--gold);
+    z-index: 101;
+    position: relative;
+  }
+  .mobile-menu-btn {
+    display: none;
+    background: none; border: none;
+    color: white; font-size: 24px;
+    cursor: pointer; padding: 4px;
+  }
+  .app-header .logo-mark {
+    width: 36px; height: 36px;
+    background: var(--gold);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; color: var(--navy);
+    flex-shrink: 0;
+  }
+  .app-header h1 { font-size: 15px; font-weight: 600; line-height: 1.3; flex: 1; }
+  .app-header h1 span { display: block; font-size: 11px; font-weight: 400; color: #8fa4c8; }
+  .header-right { margin-left: auto; font-size: 12px; color: #8fa4c8; white-space: nowrap; }
+
+  /* LAYOUT */
+  .app-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--navy-light);
+    flex-shrink: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+    z-index: 100;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #3a4f72; border-radius: 4px; }
+
+  #sidebar-backdrop {
+    display: none; position: fixed; inset: 0; 
+    background: rgba(0,0,0,0.5); z-index: 99;
+  }
+
+  .sidebar-section { padding: 8px 0; }
+  .sidebar-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    color: #5a7299; padding: 8px 16px 4px;
+    text-transform: uppercase;
+  }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 16px; color: #a8bdd8; cursor: pointer;
+    font-size: 13px; transition: all 0.15s;
+    border-left: 3px solid transparent; border-radius: 0;
+  }
+  .sidebar-item:hover { background: rgba(201,168,76,0.08); color: #c9d8f0; }
+  .sidebar-item.active {
+    background: rgba(201,168,76,0.15);
+    color: var(--gold-light);
+    border-left-color: var(--gold);
+    font-weight: 600;
+  }
+  .sidebar-item .icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+  .sidebar-divider { height: 1px; background: #2e4060; margin: 4px 0; }
+
+  .sub-menu { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+  .sub-menu.open { max-height: 1000px; }
+  .sub-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 16px 7px 42px;
+    color: #7a9ac0; cursor: pointer; font-size: 12px;
+    transition: all 0.15s; border-left: 3px solid transparent;
+  }
+  .sub-item:hover { color: #b8cfe8; background: rgba(255,255,255,0.04); }
+  .sub-item.active { color: var(--gold); border-left-color: var(--gold); font-weight: 600; }
+  .sub-item .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+  /* MAIN CONTENT */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    background: var(--cream);
+    width: 100%;
+  }
+
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.3s; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+  .welcome-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 20px; }
+  .stat-card {
+    background: white; border-radius: 12px; padding: 20px;
+    border: 1px solid var(--border); display: flex; align-items: center; gap: 14px;
+  }
+  .stat-icon { font-size: 28px; }
+  .stat-val { font-size: 26px; font-weight: 700; color: var(--navy); }
+  .stat-lbl { font-size: 12px; color: var(--text-muted); }
+
+  .page-header { margin-bottom: 20px; }
+  .page-header h2 { font-size: 20px; font-weight: 700; color: var(--navy); }
+  .page-header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+  .search-bar { position: relative; margin-bottom: 16px; }
+  .search-bar input {
+    width: 100%; padding: 10px 16px 10px 40px;
+    border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px;
+    font-family: inherit; background: white; color: var(--text); outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-bar input:focus { border-color: var(--navy); }
+  .search-bar .s-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--gray); font-size: 15px; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  .room-card {
+    background: white; border-radius: 10px;
+    padding: 14px 12px; cursor: pointer;
+    border: 1.5px solid var(--border);
+    transition: all 0.15s; position: relative; overflow: hidden;
+  }
+  .room-card:hover { border-color: var(--navy); box-shadow: 0 4px 12px rgba(26,39,68,0.12); transform: translateY(-1px); }
+  .room-card .room-num { font-size: 22px; font-weight: 700; color: var(--navy); }
+  .room-card .room-hs { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .room-card .room-badge {
+    position: absolute; top: 8px; right: 8px;
+    font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600;
+  }
+  .badge-shortage { background: var(--red-light); color: var(--red); }
+  .badge-excess { background: var(--orange-light); color: var(--orange); }
+  .badge-ok { background: var(--green-light); color: var(--green); }
+  .badge-p1 { background: #fce8e8; color: #b71c1c; border: 1px solid #ef9a9a; }
+  .badge-p2 { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+
+  .detail-back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--navy); cursor: pointer;
+    margin-bottom: 16px; font-weight: 500;
+    padding: 6px 10px; border-radius: 6px;
+    background: white; border: 1px solid var(--border); transition: all 0.15s;
+  }
+  .detail-back:hover { background: var(--gray-light); }
+
+  .detail-header {
+    background: var(--navy); color: white; border-radius: 12px;
+    padding: 20px 24px; margin-bottom: 16px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+  }
+  .detail-title { font-size: 22px; font-weight: 700; }
+  .detail-sub { font-size: 13px; color: #8fa4c8; margin-top: 4px; }
+  .detail-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+  .dstat { text-align: center; }
+  .dstat-val { font-size: 20px; font-weight: 700; }
+  .dstat-lbl { font-size: 11px; color: #8fa4c8; }
+
+  .alert {
+    border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; font-size: 13px;
+    display: flex; align-items: flex-start; gap: 10px; border-left: 4px solid;
+  }
+  .alert-red { background: var(--red-light); border-color: var(--red); color: #922b21; }
+  .alert-orange { background: var(--orange-light); border-color: var(--orange); color: #784212; }
+  .alert-green { background: var(--green-light); border-color: var(--green); color: #1e8449; }
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .table-wrap { 
+    background: white; border-radius: 12px; border: 1px solid var(--border); 
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  .table-head {
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    min-width: 400px;
+  }
+  .table-head h3 { font-size: 14px; font-weight: 600; color: var(--navy); }
+  .count-badge {
+    font-size: 12px; padding: 3px 10px; border-radius: 20px;
+    background: var(--navy); color: white; font-weight: 600;
+  }
+  table { width: 100%; border-collapse: collapse; min-width: 400px; }
+  th {
+    text-align: left; padding: 10px 20px; font-size: 11px; font-weight: 700; color: var(--gray);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    background: #f8f9fc; border-bottom: 1px solid var(--border); white-space: nowrap;
+  }
+  td { padding: 10px 20px; font-size: 13px; border-bottom: 1px solid #f0f2f7; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafbff; }
+  .stt { color: var(--gray); font-size: 12px; }
+  .class-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #eef2ff; color: #3730a3; }
+  .house-tag-g { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #e0f2fe; color: #0369a1; }
+  .house-tag-e { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #fdf2f8; color: #9d174d; }
+
+  .form-card { background: white; border-radius: 12px; border: 1px solid var(--border); padding: 24px; margin-bottom: 20px; }
+  .form-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; color: var(--navy); }
+  .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; }
+  .form-group input, .form-group select {
+    width: 100%; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 7px;
+    font-family: inherit; font-size: 13px; color: var(--text); outline: none; background: white; transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--navy); }
+  .btn {
+    padding: 9px 20px; border-radius: 8px; border: none; font-family: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn-primary { background: var(--navy); color: white; }
+  .btn-primary:hover { background: var(--navy-light); }
+  .btn-danger { background: var(--red-light); color: var(--red); }
+  .btn-danger:hover { background: #f5b7b1; }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: white;
+    padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    transform: translateY(80px); opacity: 0; transition: all 0.3s; z-index: 9999;
+    border-left: 4px solid var(--gold); box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  .empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty p { font-size: 14px; }
+
+  /* Mobile Responsive overrides */
+  @media (max-width: 768px) {
+    .mobile-menu-btn { display: block; }
+    .sidebar {
+      position: fixed; left: 0; top: 60px; bottom: 0;
+      transform: translateX(-100%);
+      box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+    }
+    .sidebar.open { transform: translateX(0); }
+    .main { padding: 16px; }
+    .app-header { padding: 0 16px; gap: 12px; }
+    .app-header h1 { font-size: 14px; }
+    .app-header h1 span { font-size: 10px; }
+    .header-right { display: none; } /* Hide text on very small screens */
+    .detail-header { flex-direction: column; gap: 12px; }
+    .detail-stats { gap: 12px; width: 100%; justify-content: space-between; }
+    .welcome-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+  <div class="logo-mark">SL</div>
+  <h1>Hệ thống quản lý Bán trú<span>THPT Chuyên Sơn La · Năm học 2026–2027</span></h1>
+  <div class="header-right">🏫 Giải pháp số trong quản trị trường học</div>
+</header>
+
+<div class="app-body">
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Tổng quan</div>
+      <div class="sidebar-item active" onclick="showPage('home')">
+        <span class="icon">🏠</span> Trang chủ
+      </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Xem theo phòng</div>
+      <div class="sidebar-item" onclick="toggleSub('sub-room-g')">
+        <span class="icon">🏢</span> Nhà G (Nam)
+      </div>
+      <div class="sub-menu" id="sub-room-g">
+        <div class="sub-item" onclick="showRoomList('G')"><span class="dot"></span>Tất cả phòng nhà G</div>
+      </div>
+      <div class="sidebar-item" onclick="toggleSub('sub-room-e')">
+        <span class="icon">🏠</span> Nhà E (Nữ)
+      </div>
+      <div class="sub-menu" id="sub-room-e">
+        <div class="sub-item" onclick="showRoomList('E')"><span class="dot"></span>Tất cả phòng nhà E</div>
+      </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Xem theo lớp</div>
+      <div class="sidebar-item" onclick="showClassList()">
+        <span class="icon">📚</span> Danh sách lớp
+      </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Đặc biệt</div>
+      <div class="sidebar-item" onclick="showOtherClass()">
+        <span class="icon">🏫</span> HS ở lại trên lớp
+      </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Quản trị viên</div>
+      <div class="sidebar-item" onclick="showManage()">
+        <span class="icon">⚙️</span> Quản lý Hệ thống
+      </div>
+    </div>
+  </nav>
+
+  <div id="sidebar-backdrop" onclick="toggleMobileMenu()"></div>
+
+  <main class="main">
+
+    <!-- OVERLAY LOADING -->
+    <div id="loading-overlay" style="position:fixed; inset:0; background:var(--cream); z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column; top: 60px;">
+        <div style="font-size: 34px; margin-bottom: 16px; animation: spin 1.5s linear infinite;">🔄</div>
+        <div style="font-size: 15px; font-weight: 600; color: var(--navy);">Đang kết nối Máy chủ Đám mây...</div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 8px;" id="loading-msg">Đang khởi tạo dữ liệu</div>
+    </div>
+    <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
+
+    <!-- HOME PAGE -->
+    <div id="page-home" class="page active">
+      <div class="page-header">
+        <h2>📊 DỮ LIỆU TỔNG QUAN</h2>
+        <p>Số lượng học sinh, cơ sở vật chất</p>
+      </div>
+      
+      <div class="welcome-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+        <div class="stat-card" style="background: linear-gradient(135deg, #1a2744 0%, #243258 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(26,39,68,0.2);">
+          <div class="stat-icon" style="color: #c9a84c;">👥</div>
+          <div>
+            <div class="stat-val" id="stat-total" style="color: white; font-size: 32px;">-</div>
+            <div class="stat-lbl" style="color: #8fa4c8; font-weight: 500;">Tổng Học sinh</div>
+          </div>
+        </div>
+        
+        <div class="stat-card" style="box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+          <div class="stat-icon">🛏️</div>
+          <div style="width: 100%;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline;">
+              <div class="stat-val" id="stat-rooms">-</div>
+              <div class="stat-lbl" style="font-weight: 500;">Tổng số phòng</div>
+            </div>
+            <div class="stat-lbl" style="margin-top:4px;">Quy mô: <span id="stat-capacity" style="font-weight:700;color:var(--navy)">-</span> giường</div>
+          </div>
+        </div>
+
+        <div class="stat-card" style="box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+          <div class="stat-icon">👦</div>
+          <div style="width: 100%;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline;">
+              <div class="stat-val" id="stat-g">-</div>
+              <div class="stat-lbl" style="font-weight: 500;">Nhà G (Nam)</div>
+            </div>
+            <div style="width:100%; height:6px; background:#e0f2fe; border-radius:3px; margin-top:8px; overflow:hidden;">
+                <div id="bar-g" style="height:100%; background:#0369a1; width:0%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card" style="box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+          <div class="stat-icon">👧</div>
+          <div style="width: 100%;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline;">
+              <div class="stat-val" id="stat-e">-</div>
+              <div class="stat-lbl" style="font-weight: 500;">Nhà E (Nữ)</div>
+            </div>
+            <div style="width:100%; height:6px; background:#fdf2f8; border-radius:3px; margin-top:8px; overflow:hidden;">
+                <div id="bar-e" style="height:100%; background:#9d174d; width:0%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-top: 20px;">
+          <!-- Báo cáo thiếu giường -->
+          <div style="background:white;border-radius:12px;padding:20px;border:1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column;">
+            <h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:18px;">⚠️</span> Tình hình cơ sở vật chất
+            </h3>
+            <div class="table-wrap" style="border: 1px solid var(--border); max-height: 280px; overflow-y: auto; flex: 1;">
+              <table>
+                <thead style="position: sticky; top: 0; z-index: 10; background: #f8f9fc;"><tr><th>Nhà</th><th>Phòng</th><th>Hiện trạng</th><th>Cảnh báo</th></tr></thead>
+                <tbody id="shortage-rooms-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Thông tin sức chứa -->
+          <div style="background:white;border-radius:12px;padding:20px;border:1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+            <h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:18px;">📈</span> Thông tin học sinh
+            </h3>
+            <div style="display:flex; flex-direction:column; gap:16px;">
+                <div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px;">
+                        <span style="color:var(--text-muted); font-weight:600;">Tỉ lệ học sinh</span>
+                        <span id="stat-fill-rate" style="font-weight:700; color:var(--navy); font-size:14px;">0%</span>
+                    </div>
+                    <div style="width:100%; height:8px; background:var(--gray-light); border-radius:4px; overflow:hidden;">
+                        <div id="bar-fill" style="height:100%; background:var(--green); width:0%; transition:width 1s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+                    </div>
+                </div>
+                
+                <div style="padding:16px; background:var(--orange-light); border-radius:8px; border:1px solid #ffcc80; display:flex; align-items:center; gap:12px;">
+                    <div style="font-size:24px; padding:12px; background:white; border-radius:50%; box-shadow:0 2px 5px rgba(230,81,0,0.1);">🛌</div>
+                    <div>
+                        <div style="font-size:13px; font-weight:700; color:#e65100; margin-bottom:2px;">Tổng số giường đang thừa: <span id="stat-excess-beds" style="font-size:16px;">0</span></div>
+                        <div style="font-size:11px; color:#a15f00; line-height:1.4;">Giường thừa đang phân tán ở các phòng.</div>
+                    </div>
+                </div>
+                
+                <div style="padding:16px; background:var(--red-light); border-radius:8px; border:1px solid #ef9a9a; display:flex; align-items:center; gap:12px;">
+                    <div style="font-size:24px; padding:12px; background:white; border-radius:50%; box-shadow:0 2px 5px rgba(183,28,28,0.1);">🚨</div>
+                    <div>
+                        <div style="font-size:13px; font-weight:700; color:#b71c1c; margin-bottom:2px;">Tổng số giường thiếu: <span id="stat-shortage-beds" style="font-size:16px;">0</span></div>
+                        <div style="font-size:11px; color:#c62828; line-height:1.4;">Số giường cần bổ sung.</div>
+                    </div>
+                </div>
+            </div>
+          </div>
+      </div>
+    </div>
+
+    <!-- ROOM LIST PAGE -->
+    <div id="page-room-list" class="page">
+      <div class="page-header">
+        <h2 id="room-list-title">Phòng nhà G</h2>
+        <p id="room-list-sub">Danh sách các phòng</p>
+      </div>
+      <div class="search-bar">
+        <span class="s-icon">🔍</span>
+        <input type="text" id="room-search" placeholder="Tìm phòng..." oninput="filterRooms()">
+      </div>
+      <div class="card-grid" id="room-card-grid"></div>
+    </div>
+
+    <!-- ROOM DETAIL PAGE -->
+    <div id="page-room-detail" class="page">
+      <div class="detail-back" onclick="goBackRooms()">← Quay lại danh sách phòng</div>
+      <div class="detail-header">
+        <div>
+          <div class="detail-title" id="rd-title">Phòng ---</div>
+          <div class="detail-sub" id="rd-sub">Nhà - · Tầng -</div>
+        </div>
+        <div class="detail-stats">
+          <div class="dstat"><div class="dstat-val" id="rd-hs">-</div><div class="dstat-lbl">Học sinh</div></div>
+          <div class="dstat"><div class="dstat-val" id="rd-bed">-</div><div class="dstat-lbl">Giường</div></div>
+          <div class="dstat"><div class="dstat-val" id="rd-status">-</div><div class="dstat-lbl">Tình trạng</div></div>
+        </div>
+      </div>
+      <div id="rd-alerts"></div>
+      <div class="table-wrap">
+        <div class="table-head">
+          <h3>Danh sách học sinh</h3>
+          <span class="count-badge" id="rd-count">0 HS</span>
+        </div>
+        <table>
+          <thead><tr><th>STT</th><th>Họ và tên</th><th>Lớp</th></tr></thead>
+          <tbody id="rd-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CLASS LIST PAGE -->
+    <div id="page-class-list" class="page">
+      <div class="page-header">
+        <h2>Danh sách lớp</h2>
+        <p>Chọn lớp để xem danh sách học sinh bán trú</p>
+      </div>
+      <div class="search-bar">
+        <span class="s-icon">🔍</span>
+        <input type="text" id="class-search" placeholder="Tìm lớp..." oninput="filterClasses()">
+      </div>
+      <div id="class-tabs" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="filterClassGrade('all')" id="tab-all">Tất cả</button>
+        <button class="btn" onclick="filterClassGrade('10')" id="tab-10" style="background:white;border:1px solid var(--border);">Khối 10</button>
+        <button class="btn" onclick="filterClassGrade('11')" id="tab-11" style="background:white;border:1px solid var(--border);">Khối 11</button>
+        <button class="btn" onclick="filterClassGrade('12')" id="tab-12" style="background:white;border:1px solid var(--border);">Khối 12</button>
+      </div>
+      <div class="card-grid" id="class-card-grid"></div>
+    </div>
+
+    <!-- CLASS DETAIL PAGE -->
+    <div id="page-class-detail" class="page">
+      <div class="detail-back" onclick="showClassList()">← Quay lại danh sách lớp</div>
+      <div class="detail-header">
+        <div>
+          <div class="detail-title" id="cd-title">Lớp ---</div>
+          <div class="detail-sub" id="cd-sub">Học sinh bán trú</div>
+        </div>
+        <div class="detail-stats">
+          <div class="dstat"><div class="dstat-val" id="cd-hs">-</div><div class="dstat-lbl">Học sinh</div></div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-head">
+          <h3>Danh sách học sinh</h3>
+          <span class="count-badge" id="cd-count">0 HS</span>
+        </div>
+        <table>
+          <thead><tr><th>STT</th><th>Họ và tên</th><th>Phòng</th><th>Nhà</th></tr></thead>
+          <tbody id="cd-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ON-CLASS PAGE -->
+    <div id="page-onclass" class="page">
+      <div class="page-header">
+        <h2>🏫 Học sinh ở lại trên lớp</h2>
+        <p>Danh sách học sinh không ở phòng bán trú, ở lại trên lớp</p>
+      </div>
+      <div class="table-wrap">
+        <div class="table-head">
+          <h3>Danh sách học sinh ở lại lớp</h3>
+          <span class="count-badge" id="oc-count">0 HS</span>
+        </div>
+        <table>
+          <thead><tr><th>STT</th><th>Họ và tên</th><th>Lớp</th><th>Nhà</th></tr></thead>
+          <tbody id="oc-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MANAGE PAGE (ADMIN) -->
+    <div id="page-manage" class="page">
+      <div class="page-header">
+        <h2>⚙️ Quản lý Hệ thống Đám mây</h2>
+        <p>Cập nhật danh sách học sinh và phòng ở (Yêu cầu quyền Quản trị)</p>
+      </div>
+
+      <!-- Login View -->
+      <div id="admin-login-view" class="form-card" style="text-align:center; max-width: 400px; margin: 40px auto;">
+        <div style="font-size: 40px; margin-bottom: 12px;">🔒</div>
+        <h3>Đăng nhập Quản trị</h3>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:20px;">
+          Vui lòng đăng nhập để cập nhật dữ liệu.<br>
+        </p>
+        <div class="form-group" style="margin-bottom:16px; text-align:left;">
+            <input type="password" id="admin-password" placeholder="Nhập mật khẩu..." onkeypress="if(event.key==='Enter') loginAdmin()" style="text-align:center; padding:12px;">
+        </div>
+        <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="loginAdmin()">Mở khóa Quản trị</button>
+      </div>
+
+      <!-- Manage View -->
+      <div id="admin-manage-view" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; background:var(--green-light); border:1px solid var(--green); padding: 12px 16px; border-radius: 8px;">
+            <p style="color:var(--green); font-weight:600; font-size:13px;">✅ Đang ở chế độ Quản trị viên</p>
+            <button class="btn btn-danger btn-sm" onclick="logoutAdmin()">Đăng xuất</button>
+        </div>
+
+        <!-- Manage Rooms -->
+        <div class="form-card">
+            <h3>🏢 Quản lý Phòng</h3>
+            <div style="display:flex; gap: 24px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 250px; border-right: 1px solid var(--border); padding-right: 16px;">
+                    <h4 style="font-size:13px; margin-bottom:12px; color:var(--navy);">➕ Thêm phòng mới</h4>
+                    <div class="form-row">
+                      <div class="form-group"><label>Khu Nhà</label><select id="room-add-house"><option value="G">Nhà G (Nam)</option><option value="E">Nhà E (Nữ)</option></select></div>
+                      <div class="form-group"><label>Số phòng</label><input type="text" id="room-add-num" placeholder="VD: 201"></div>
+                    </div>
+                    <div class="form-group" style="margin-bottom:12px;"><label>Số giường quy định</label><input type="number" id="room-add-beds" placeholder="VD: 6"></div>
+                    <button class="btn btn-primary btn-sm" onclick="addRoom()">Thêm phòng</button>
+                </div>
+                
+                <div style="flex: 1; min-width: 250px;">
+                    <h4 style="font-size:13px; margin-bottom:12px; color:var(--red);">🗑️ Xóa phòng</h4>
+                    <div class="form-group" style="margin-bottom:12px;"><label>Khu Nhà</label><select id="room-del-house" onchange="updateRoomSelects()"><option value="G">Nhà G (Nam)</option><option value="E">Nhà E (Nữ)</option></select></div>
+                    <div class="form-group" style="margin-bottom:12px;"><label>Chọn Phòng cần xóa</label><select id="room-del-num"></select></div>
+                    <button class="btn btn-danger btn-sm" onclick="deleteRoom()">Xóa phòng này</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Students -->
+        <div class="form-card">
+          <h3>➕ Bổ sung Học sinh</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Họ và tên *</label><input type="text" id="add-name" placeholder="Nhập họ và tên"></div>
+            <div class="form-group"><label>Lớp *</label><input type="text" id="add-class" placeholder="VD: 10 Toán 1"></div>
+            <div class="form-group"><label>Nhà *</label><select id="add-house" onchange="updateRoomSelects()"><option value="G">Nhà G (Nam)</option><option value="E">Nhà E (Nữ)</option></select></div>
+            <div class="form-group"><label>Phòng *</label><select id="add-room"></select></div>
+          </div>
+          <button class="btn btn-primary" onclick="addStudent()">Thêm học sinh</button>
+        </div>
+
+        <div class="form-card">
+          <h3>🗑️ Xóa Học sinh</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Nhà</label><select id="del-house" onchange="renderDeleteTable()"><option value="G">Nhà G (Nam)</option><option value="E">Nhà E (Nữ)</option></select></div>
+            <div class="form-group"><label>Tìm theo tên hoặc lớp</label><input type="text" id="del-search" placeholder="Nhập từ khóa..." oninput="renderDeleteTable()"></div>
+          </div>
+          <div class="table-wrap" style="margin-top:12px;">
+            <table>
+              <thead><tr><th>Họ và tên</th><th>Lớp</th><th>Phòng</th><th>Thao tác</th></tr></thead>
+              <tbody id="del-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Custom Confirm Modal -->
+<div id="confirm-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:10000; align-items:center; justify-content:center;">
+    <div style="background:white; padding:24px; border-radius:12px; max-width:400px; width:90%; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+        <h3 style="margin-bottom:12px; color:var(--navy); font-size:16px;">Xác nhận hành động</h3>
+        <p id="confirm-msg" style="font-size:14px; color:var(--text-muted); margin-bottom:24px; line-height:1.5;"></p>
+        <div style="display:flex; justify-content:flex-end; gap:12px;">
+            <button class="btn" style="background:var(--gray-light); color:var(--text);" onclick="closeConfirm()">Hủy</button>
+            <button class="btn btn-danger" id="confirm-btn" onclick="executeConfirm()">Đồng ý</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+// Cấu hình Firebase theo yêu cầu
+const firebaseConfig = {
+  apiKey: "AIzaSyBuIBysD6BkiRnepBpMpiKgGw1LiyovSIY",
+  authDomain: "quanlyhocsinhbantru-4f2b9.firebaseapp.com",
+  databaseURL: "https://quanlyhocsinhbantru-4f2b9-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "quanlyhocsinhbantru-4f2b9",
+  storageBucket: "quanlyhocsinhbantru-4f2b9.firebasestorage.app",
+  messagingSenderId: "995379061557",
+  appId: "1:995379061557:web:02352b6a712495a477a27c"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Đổi kênh dữ liệu sang v3 để bắt buộc nạp lại bản Full Array chưa bị rút gọn
+const appId = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.projectId;
+const publicDataPath = ['artifacts', appId, 'public', 'data', 'bantru_main_v5', 'state'];
+
+let globalData = {
+    rooms: { G: {}, E: {} },
+    students: { G: [], E: [] }
+};
+
+let user = null;
+let currentHouse = 'G';
+let currentRoomBack = 'G';
+let classGradeFilter = 'all';
+let currentRoomDetail = '';
+let currentClassDetail = '';
+let isAdmin = false;
+let confirmCallback = null;
+
+async function initSystem() {
+    try {
+        document.getElementById('loading-msg').textContent = "Đang xác thực quyền truy cập...";
+        // Mandatory Rule 3: Auth Before Queries
+        const cred = await signInAnonymously(auth);
+        user = cred.user;
+        
+        if (user) {
+            document.getElementById('loading-msg').textContent = "Đang tải dữ liệu từ Đám mây...";
+            listenToData();
+        }
+    } catch (e) {
+        console.error("Lỗi xác thực:", e);
+        document.getElementById('loading-overlay').innerHTML = `
+            <div style="color:var(--red); text-align:center; padding:20px;">
+                <h3>⚠️ Không thể kết nối Máy chủ</h3>
+                <p style="font-size:13px; margin-top:8px;">Vui lòng kiểm tra lại cấu hình Firebase API hoặc mạng của bạn.</p>
+                <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Chi tiết lỗi: ${e.message}</p>
+            </div>
+        `;
+    }
+}
+
+function listenToData() {
+    if (!user) return;
+    const docRef = doc(db, ...publicDataPath);
+    
+    onSnapshot(docRef, (snap) => {
+        if (snap.exists()) {
+            globalData = snap.data();
+            document.getElementById('loading-overlay').style.display = 'none';
+            refreshCurrentView();
+        } else {
+            // Seed data initially if empty
+            globalData = {
+                rooms: { G: defaultRoomsG(), E: defaultRoomsE() },
+                students: { G: defaultStudentsG(), E: defaultStudentsE() }
+            };
+            syncData();
+        }
+    }, (err) => {
+        console.error("Lỗi Snapshot:", err);
+        showToast("Lỗi đồng bộ dữ liệu thời gian thực!");
+    });
+}
+
+async function syncData() {
+    if (!user) return;
+    const docRef = doc(db, ...publicDataPath);
+    try {
+        await setDoc(docRef, globalData);
+        // Toast shown conditionally in UI actions
+    } catch (e) {
+        console.error("Lỗi đồng bộ:", e);
+        showToast("Lỗi lưu dữ liệu: " + e.message);
+    }
+}
+
+window.showPage = function(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  
+  // Close sidebar on mobile after clicking
+  const sb = document.querySelector('.sidebar');
+  if(sb.classList.contains('open') && window.innerWidth <= 768) {
+      toggleMobileMenu();
+  }
+}
+
+window.toggleSub = function(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+window.toggleMobileMenu = function() {
+    const sb = document.querySelector('.sidebar');
+    const bd = document.getElementById('sidebar-backdrop');
+    if(sb.classList.contains('open')) {
+        sb.classList.remove('open');
+        bd.style.display = 'none';
+    } else {
+        sb.classList.add('open');
+        bd.style.display = 'block';
+    }
+}
+
+function updateStats() {
+  const gCount = globalData.students.G.length;
+  const eCount = globalData.students.E.length;
+  const totalStudents = gCount + eCount;
+  
+  const elTotal = document.getElementById('stat-total');
+  if (elTotal) elTotal.textContent = totalStudents;
+  const elG = document.getElementById('stat-g');
+  if (elG) elG.textContent = gCount;
+  const elE = document.getElementById('stat-e');
+  if (elE) elE.textContent = eCount;
+
+  let totalRooms = 0;
+  let totalBeds = 0;
+  let totalExcess = 0;
+  let totalShortage = 0;
+  let shortageRows = '';
+
+  ['G', 'E'].forEach(house => {
+      const houseName = house === 'G' ? 'Nhà G (Nam)' : 'Nhà E (Nữ)';
+      Object.keys(globalData.rooms[house]).forEach(r => {
+          totalRooms++;
+          const info = globalData.rooms[house][r];
+          totalBeds += info.beds;
+          
+          // Đếm số học sinh hiện có trong phòng này
+          const studentsInRoom = globalData.students[house].filter(s => s.room === r).length;
+          
+          // Tính toán thừa / thiếu theo thời gian thực (Bỏ qua cấu hình ảo trong default)
+          const diff = studentsInRoom - info.beds;
+          const displayShortage = diff > 0 ? diff : 0;
+          const displayExcess = diff < 0 ? Math.abs(diff) : 0;
+          
+          totalShortage += displayShortage;
+          totalExcess += displayExcess;
+          
+          if(displayShortage > 0) {
+              let badgeTxt = `Thiếu ${displayShortage} giường`;
+              let styleStr = 'padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-block;';
+              
+              if (info.priority === 'P1' || displayShortage >= 3) { 
+                badgeTxt = `Thiếu ${displayShortage} (🔴 Ưu tiên 1)`; 
+                styleStr += 'background: #fce8e8; color: #b71c1c; border: 1px solid #ef9a9a;'; 
+              } else if (info.priority === 'P2' || displayShortage >= 2) { 
+                badgeTxt = `Thiếu ${displayShortage} (🟠 Ưu tiên 2)`; 
+                styleStr += 'background: #fff3e0; color: #e65100; border: 1px solid #ffcc80;'; 
+              } else {
+                styleStr += 'background: var(--red-light); color: var(--red);';
+              }
+              
+              shortageRows += `
+                <tr>
+                  <td><span class="${house === 'G' ? 'house-tag-g' : 'house-tag-e'}">${houseName}</span></td>
+                  <td style="font-weight:600; color:var(--navy);">P.${r}</td>
+                  <td>${studentsInRoom} / ${info.beds}</td>
+                  <td><span style="${styleStr}">${badgeTxt}</span></td>
+                </tr>
+              `;
+          }
+      });
+  });
+  
+  const elRooms = document.getElementById('stat-rooms');
+  if (elRooms) elRooms.textContent = totalRooms;
+  
+  const elCapacity = document.getElementById('stat-capacity');
+  if (elCapacity) elCapacity.textContent = totalBeds;
+  
+  const elExcess = document.getElementById('stat-excess-beds');
+  if (elExcess) elExcess.textContent = totalExcess;
+  
+  const elShortageTotal = document.getElementById('stat-shortage-beds');
+  if (elShortageTotal) elShortageTotal.textContent = totalShortage;
+  
+  // Progress bars and Fill rate
+  const inRoomStudents = globalData.students.G.filter(s=>s.room!=='Ở trên lớp').length + globalData.students.E.filter(s=>s.room!=='Ở trên lớp').length;
+  const fillRate = totalBeds > 0 ? Math.min(100, Math.round((inRoomStudents / totalBeds) * 100)) : 0;
+  
+  const elFillRate = document.getElementById('stat-fill-rate');
+  const elBarFill = document.getElementById('bar-fill');
+  if (elFillRate) elFillRate.textContent = fillRate + '%';
+  if (elBarFill) {
+      elBarFill.style.width = fillRate + '%';
+      if(fillRate > 100) elBarFill.style.background = 'var(--red)';
+      else if(fillRate > 90) elBarFill.style.background = 'var(--orange)';
+      else elBarFill.style.background = 'var(--green)';
+  }
+  
+  const barG = document.getElementById('bar-g');
+  if(barG) barG.style.width = (totalStudents > 0 ? Math.round((gCount/totalStudents)*100) : 0) + '%';
+  const barE = document.getElementById('bar-e');
+  if(barE) barE.style.width = (totalStudents > 0 ? Math.round((eCount/totalStudents)*100) : 0) + '%';
+  
+  const tbody = document.getElementById('shortage-rooms-tbody');
+  if(tbody) {
+      tbody.innerHTML = shortageRows || '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:30px;">🎉 Hệ thống phòng hiện đang đáp ứng đủ số giường!</td></tr>';
+  }
+}
+
+window.showRoomList = function(house) {
+  currentHouse = house; currentRoomBack = house;
+  window.showPage('room-list');
+  document.getElementById('room-list-title').textContent = house === 'G' ? '🏢 Nhà G – Phòng nam' : '🏠 Nhà E – Phòng nữ';
+  
+  const rc = Object.keys(globalData.rooms[house] || {}).length;
+  document.getElementById('room-list-sub').textContent = `Danh sách ${rc} phòng · Nhà ${house}`;
+  renderRoomGrid(house);
+  document.getElementById('room-search').value = '';
+}
+
+function renderRoomGrid(house) {
+  const rooms = globalData.rooms[house] || {};
+  const grid = document.getElementById('room-card-grid');
+  const stus = globalData.students[house] || [];
+  grid.innerHTML = '';
+  
+  const roomKeys = Object.keys(rooms).sort();
+  if(roomKeys.length === 0) {
+      grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><p>Chưa có phòng nào</p></div>';
+      return;
+  }
+
+  roomKeys.forEach(rn => {
+    const info = rooms[rn];
+    const cnt = stus.filter(s => s.room == rn).length;
+    let badge = '', badgeClass = 'badge-ok', badgeTxt = '✓ Đủ';
+    
+    // Tự động tính toán thực tế
+    const diff = cnt - info.beds;
+    const realShortage = diff > 0 ? diff : 0;
+    const realExcess = diff < 0 ? Math.abs(diff) : 0;
+
+    if (realShortage > 0) {
+      badgeTxt = `⚠ Thiếu ${realShortage}`; badgeClass = 'badge-shortage';
+      if (realShortage >= 3 || info.priority === 'P1') { badgeTxt = '🔴 Ưu tiên 1'; badgeClass = 'badge-p1'; }
+      else if (realShortage >= 2 || info.priority === 'P2') { badgeTxt = '🟠 Ưu tiên 2'; badgeClass = 'badge-p2'; }
+    } else if (realExcess > 0) {
+      badgeTxt = `↑ Thừa ${realExcess}`; badgeClass = 'badge-excess';
+    }
+    grid.innerHTML += `
+      <div class="room-card" onclick="showRoomDetail('${house}','${rn}')">
+        <span class="room-badge ${badgeClass}">${badgeTxt}</span>
+        <div class="room-num">P${rn}</div>
+        <div class="room-hs">${cnt} học sinh · ${info.beds} giường</div>
+      </div>`;
+  });
+}
+
+window.filterRooms = function() {
+  const q = document.getElementById('room-search').value.toLowerCase();
+  document.querySelectorAll('.room-card').forEach(c => {
+    c.style.display = c.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+window.showRoomDetail = function(house, room) {
+  currentHouse = house; currentRoomDetail = room;
+  window.showPage('room-detail');
+  const rooms = globalData.rooms[house];
+  const info = rooms[room];
+  const stus = globalData.students[house].filter(s => s.room == room);
+  const cnt = stus.length;
+
+  document.getElementById('rd-title').textContent = `Phòng ${room}`;
+  document.getElementById('rd-sub').textContent = `Nhà ${house === 'G' ? 'G (Nam)' : 'E (Nữ)'}`;
+  document.getElementById('rd-hs').textContent = cnt;
+  document.getElementById('rd-bed').textContent = info.beds;
+  document.getElementById('rd-count').textContent = cnt + ' HS';
+
+  // Tự động tính toán thực tế
+  const diff = cnt - info.beds;
+  const realShortage = diff > 0 ? diff : 0;
+  const realExcess = diff < 0 ? Math.abs(diff) : 0;
+
+  let alerts = '';
+  if (realShortage > 0) {
+    document.getElementById('rd-status').textContent = `Thiếu ${realShortage} giường`;
+    let alertClass = 'alert-red', alertIcon = '🔴';
+    let msg = `Phòng đang thiếu <b>${realShortage} giường</b>. `;
+    if (realShortage >= 3 || info.priority === 'P1') { msg += '⚡ <b>Ưu tiên 1</b>: Cần bổ sung ngay.'; alertClass = 'alert-red'; } 
+    else if (realShortage >= 2 || info.priority === 'P2') { msg += '🟠 <b>Ưu tiên 2</b>: Cần bổ sung.'; alertClass = 'alert-orange'; }
+    alerts = `<div class="alert ${alertClass}"><span class="alert-icon">${alertIcon}</span><div>${msg}</div></div>`;
+  } else if (realExcess > 0) {
+    document.getElementById('rd-status').textContent = `Thừa ${realExcess} giường`;
+    alerts = `<div class="alert alert-orange"><span class="alert-icon">ℹ️</span><div>Phòng đang thừa <b>${realExcess} giường</b>.</div></div>`;
+  } else {
+    document.getElementById('rd-status').textContent = 'Đủ giường';
+    alerts = `<div class="alert alert-green"><span class="alert-icon">✅</span><div>Số giường đủ cho số học sinh trong phòng.</div></div>`;
+  }
+  document.getElementById('rd-alerts').innerHTML = alerts;
+
+  let rows = '';
+  stus.forEach((s, i) => { rows += `<tr><td class="stt">${i+1}</td><td>${s.name}</td><td><span class="class-tag">${s.cls}</span></td></tr>`; });
+  document.getElementById('rd-tbody').innerHTML = rows || '<tr><td colspan="3" style="text-align:center;color:#aaa;padding:24px;">Chưa có học sinh</td></tr>';
+}
+
+window.goBackRooms = function() { window.showRoomList(currentRoomBack); }
+
+/* CLASS LIST LOGIC */
+window.showClassList = function() {
+  window.showPage('class-list');
+  document.getElementById('class-search').value = '';
+  renderClassGrid();
+}
+
+function getAllClasses() {
+  const allStus = [...globalData.students.G.filter(s=>s.room!=='Ở trên lớp'), ...globalData.students.E.filter(s=>s.room!=='Ở trên lớp')];
+  const classMap = {};
+  allStus.forEach(s => { classMap[s.cls] = (classMap[s.cls]||0) + 1; });
+  return classMap;
+}
+
+window.renderClassGrid = function() {
+  const grid = document.getElementById('class-card-grid');
+  const classMap = getAllClasses();
+  const q = document.getElementById('class-search').value.toLowerCase();
+  grid.innerHTML = '';
+  const sorted = Object.keys(classMap).sort((a,b) => a.localeCompare(b, 'vi'));
+  let found = false;
+  sorted.forEach(cls => {
+    if (q && !cls.toLowerCase().includes(q)) return;
+    if (classGradeFilter !== 'all' && !cls.startsWith(classGradeFilter)) return;
+    found = true;
+    grid.innerHTML += `
+      <div class="room-card" onclick="showClassDetail('${cls}')">
+        <div class="room-num" style="font-size:14px;font-weight:700">${cls}</div>
+        <div class="room-hs">${classMap[cls]} học sinh</div>
+      </div>`;
+  });
+  if (!found) grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><p>Không tìm thấy lớp phù hợp</p></div>';
+}
+
+window.filterClasses = function() { window.renderClassGrid(); }
+
+window.filterClassGrade = function(g) {
+  classGradeFilter = g;
+  document.querySelectorAll('#class-tabs button').forEach(b => {
+    b.style.background = 'white'; b.style.border = '1px solid var(--border)'; b.classList.remove('btn-primary');
+    b.style.color = 'var(--text)';
+  });
+  const t = document.getElementById('tab-' + g);
+  t.style.background = 'var(--navy)'; t.style.color = 'white'; t.style.border = '1px solid var(--navy)';
+  window.renderClassGrid();
+}
+
+window.showClassDetail = function(cls) {
+  currentClassDetail = cls;
+  window.showPage('class-detail');
+  const allStus = [
+    ...globalData.students.G.filter(s=>s.room!=='Ở trên lớp' && s.cls===cls).map(s=>({...s,house:'G'})),
+    ...globalData.students.E.filter(s=>s.room!=='Ở trên lớp' && s.cls===cls).map(s=>({...s,house:'E'}))
+  ];
+  document.getElementById('cd-title').textContent = `Lớp ${cls}`;
+  document.getElementById('cd-hs').textContent = allStus.length;
+  document.getElementById('cd-count').textContent = allStus.length + ' HS';
+  let rows = '';
+  allStus.forEach((s, i) => {
+    const houseTag = s.house === 'G' ? `<span class="house-tag-g">Nhà G</span>` : `<span class="house-tag-e">Nhà E</span>`;
+    rows += `<tr><td class="stt">${i+1}</td><td>${s.name}</td><td>P.${s.room}</td><td>${houseTag}</td></tr>`;
+  });
+  document.getElementById('cd-tbody').innerHTML = rows || '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Chưa có học sinh</td></tr>';
+}
+
+window.showOtherClass = function() {
+  window.showPage('onclass');
+  const all = [
+    ...globalData.students.G.filter(s=>s.room==='Ở trên lớp').map(s=>({...s,house:'G'})),
+    ...globalData.students.E.filter(s=>s.room==='Ở trên lớp').map(s=>({...s,house:'E'}))
+  ];
+  document.getElementById('oc-count').textContent = all.length + ' HS';
+  let rows = '';
+  all.forEach((s,i) => {
+    const hTag = s.house==='G'?`<span class="house-tag-g">Nhà G</span>`:`<span class="house-tag-e">Nhà E</span>`;
+    rows += `<tr><td class="stt">${i+1}</td><td>${s.name}</td><td><span class="class-tag">${s.cls}</span></td><td>${hTag}</td></tr>`;
+  });
+  document.getElementById('oc-tbody').innerHTML = rows || '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Không có học sinh</td></tr>';
+}
+
+window.showManage = function() {
+  window.showPage('manage');
+  if (isAdmin) {
+      window.updateRoomSelects();
+      window.renderDeleteTable();
+  }
+}
+
+window.loginAdmin = function() {
+    const pass = document.getElementById('admin-password').value;
+    if(pass === 'admin2026') {
+        isAdmin = true;
+        document.getElementById('admin-login-view').style.display = 'none';
+        document.getElementById('admin-manage-view').style.display = 'block';
+        document.getElementById('admin-password').value = '';
+        window.showToast('✅ Mở khóa Quản trị thành công!');
+        window.updateRoomSelects();
+        window.renderDeleteTable();
+    } else {
+        window.showToast('❌ Sai mật khẩu!');
+    }
+}
+window.logoutAdmin = function() {
+    isAdmin = false;
+    document.getElementById('admin-login-view').style.display = 'block';
+    document.getElementById('admin-manage-view').style.display = 'none';
+    window.showToast('Đã đóng chế độ Quản trị.');
+}
+
+window.updateRoomSelects = function() {
+  const addHouse = document.getElementById('add-house').value;
+  const addSel = document.getElementById('add-room');
+  addSel.innerHTML = '<option value="Ở trên lớp">Ở trên lớp</option>';
+  if(globalData.rooms[addHouse]) {
+      Object.keys(globalData.rooms[addHouse]).sort().forEach(r => { addSel.innerHTML += `<option value="${r}">Phòng ${r}</option>`; });
+  }
+
+  const delHouse = document.getElementById('room-del-house').value;
+  const delSel = document.getElementById('room-del-num');
+  delSel.innerHTML = '';
+  if(globalData.rooms[delHouse]) {
+      Object.keys(globalData.rooms[delHouse]).sort().forEach(r => { delSel.innerHTML += `<option value="${r}">Phòng ${r}</option>`; });
+  }
+}
+
+window.addRoom = function() {
+    const house = document.getElementById('room-add-house').value;
+    const roomNum = document.getElementById('room-add-num').value.trim();
+    const beds = parseInt(document.getElementById('room-add-beds').value);
+    if(!roomNum || isNaN(beds)) { window.showToast('⚠️ Vui lòng nhập Số phòng và Số giường hợp lệ!'); return; }
+    if(globalData.rooms[house][roomNum]) { window.showToast('⚠️ Phòng này đã tồn tại!'); return; }
+    
+    globalData.rooms[house][roomNum] = { beds: beds, shortage: 0, excess: 0, priority: '' };
+    syncData().then(() => {
+        window.showToast(`✅ Đã thêm phòng ${roomNum} nhà ${house}`);
+        document.getElementById('room-add-num').value = '';
+        window.updateRoomSelects();
+    });
+}
+
+window.deleteRoom = function() {
+    const house = document.getElementById('room-del-house').value;
+    const roomNum = document.getElementById('room-del-num').value;
+    if(!roomNum) return;
+    
+    const stus = globalData.students[house].filter(s => s.room == roomNum);
+    if(stus.length > 0) {
+        window.showToast(`⚠️ Không thể xóa! Phòng ${roomNum} đang có ${stus.length} học sinh.`);
+        return;
+    }
+    
+    window.showConfirm(`Bạn có chắc chắn muốn xóa vĩnh viễn <b>Phòng ${roomNum} Nhà ${house}</b> khỏi hệ thống?`, () => {
+        delete globalData.rooms[house][roomNum];
+        syncData().then(() => {
+            window.showToast(`🗑️ Đã xóa phòng ${roomNum} nhà ${house}`);
+            window.updateRoomSelects();
+        });
+    });
+}
+
+window.addStudent = function() {
+  const name = document.getElementById('add-name').value.trim();
+  const cls = document.getElementById('add-class').value.trim();
+  const house = document.getElementById('add-house').value;
+  const room = document.getElementById('add-room').value;
+  if (!name || !cls) { window.showToast('⚠️ Vui lòng nhập đầy đủ họ tên và lớp!'); return; }
+  
+  globalData.students[house].push({ name, cls, room });
+  syncData().then(() => {
+      document.getElementById('add-name').value = '';
+      document.getElementById('add-class').value = '';
+      window.renderDeleteTable();
+      window.showToast(`✅ Đã thêm: ${name} (${cls})`);
+  });
+}
+
+window.renderDeleteTable = function() {
+  const house = document.getElementById('del-house').value;
+  const q = document.getElementById('del-search').value.toLowerCase();
+  const stus = globalData.students[house] || [];
+  let rows = '';
+  stus.forEach((s, i) => {
+    if (q && !s.name.toLowerCase().includes(q) && !s.cls.toLowerCase().includes(q)) return;
+    rows += `<tr>
+      <td>${s.name}</td><td><span class="class-tag">${s.cls}</span></td><td>P.${s.room}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="removeStudent('${house}',${i})">Xóa</button></td>
+    </tr>`;
+  });
+  document.getElementById('del-tbody').innerHTML = rows || '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:16px;">Không tìm thấy học sinh</td></tr>';
+}
+
+window.removeStudent = function(house, idx) {
+  const s = globalData.students[house][idx];
+  window.showConfirm(`Xác nhận xóa học sinh <b>${s.name} (${s.cls})</b> khỏi hệ thống bán trú?`, () => {
+      globalData.students[house].splice(idx, 1);
+      syncData().then(() => {
+          window.renderDeleteTable();
+          window.showToast(`🗑️ Đã xóa: ${s.name}`);
+      });
+  });
+}
+
+window.showConfirm = function(msg, callback) {
+    document.getElementById('confirm-msg').innerHTML = msg;
+    confirmCallback = callback;
+    document.getElementById('confirm-modal').style.display = 'flex';
+}
+window.closeConfirm = function() {
+    document.getElementById('confirm-modal').style.display = 'none';
+    confirmCallback = null;
+}
+window.executeConfirm = function() {
+    if (confirmCallback) {
+        confirmCallback(); // Chạy lệnh xóa đã được lưu
+    }
+    window.closeConfirm(); // Đóng bảng thông báo
+}
+window.showToast = function(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function refreshCurrentView() {
+    updateStats();
+    const activePage = document.querySelector('.page.active').id;
+    if(activePage === 'page-room-list') renderRoomGrid(currentHouse);
+    else if(activePage === 'page-room-detail') window.showRoomDetail(currentHouse, currentRoomDetail);
+    else if(activePage === 'page-class-list') window.renderClassGrid();
+    else if(activePage === 'page-class-detail') window.showClassDetail(currentClassDetail);
+    else if(activePage === 'page-onclass') window.showOtherClass();
+    else if(activePage === 'page-manage' && isAdmin) {
+        window.renderDeleteTable(); window.updateRoomSelects();
+    }
+}
+
+function defaultRoomsG() {
+  return {
+    102: { beds: 8, shortage: 0, excess: 0, priority: '' },
+    103: { beds: 8, shortage: 0, excess: 0, priority: '' },
+    104: { beds: 8, shortage: 0, excess: 0, priority: '' },
+    105: { beds: 10, shortage: 0, excess: 0, priority: '' },
+    106: { beds: 10, shortage: 0, excess: 0, priority: '' },
+    107: { beds: 8, shortage: 0, excess: 0, priority: '' },
+    108: { beds: 8, shortage: 0, excess: 0, priority: '' },
+    304: { beds: 8, shortage: 0, excess: 0, priority: '' },
+    307: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    308: { beds: 10, shortage: 0, excess: 0, priority: '' },
+    401: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    402: { beds: 10, shortage: 0, excess: 0, priority: '' },
+    403: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    404: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    405: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    406: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    407: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    408: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    501: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    502: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    503: { beds: 10, shortage: 0, excess: 0, priority: '' },
+    504: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    505: { beds: 14, shortage: 0, excess: 0, priority: '' },
+    506: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    507: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    508: { beds: 12, shortage: 0, excess: 0, priority: '' },
+  };
+}
+
+function defaultRoomsE() {
+  return {
+    101: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    102: { beds: 6, shortage: 0, excess: 0, priority: '' },
+    104: { beds: 10, shortage: 0, excess: 0, priority: 'P2' },
+    105: { beds: 10, shortage: 0, excess: 0, priority: 'P1' },
+    106: { beds: 10, shortage: 0, excess: 0, priority: 'P1' },
+    107: { beds: 10, shortage: 0, excess: 0, priority: '' },
+    108: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    402: { beds: 12, shortage: 0, excess: 0, priority: 'P2' },
+    403: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    404: { beds: 12, shortage: 0, excess: 0, priority: 'P1' },
+    405: { beds: 12, shortage: 0, excess: 0, priority: 'P2' },
+    406: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    407: { beds: 6, shortage: 0, excess: 0, priority: '' },
+    408: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    501: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    502: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    503: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    504: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    505: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    506: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    507: { beds: 12, shortage: 0, excess: 0, priority: '' },
+    508: { beds: 12, shortage: 0, excess: 0, priority: 'P1' },
+  };
+}
+
+// Khôi phục 100% dữ liệu gốc (Không bị rút gọn)
+function defaultStudentsG() {
+  return [
+    {name:"Bùi Gia An",cls:"12 Lí",room:"102"},
+    {name:"Đặng Minh Đức",cls:"12 Lí",room:"102"},
+    {name:"Nguyễn Hà Giang",cls:"12 Lí",room:"102"},
+    {name:"Nguyễn Hoàng Nhật Minh",cls:"12 Lí",room:"102"},
+    {name:"Nguyễn Như Hiển",cls:"12 Lí",room:"102"},
+    {name:"Trần Quốc Hoàng",cls:"12 Lí",room:"102"},
+    {name:"Trần Trung Hiếu",cls:"12 Lí",room:"102"},
+    {name:"Vũ Tuấn Đạt",cls:"12 Lí",room:"102"},
+    {name:"Hoàng Hải Tiến",cls:"12 Lí",room:"102"},
+    {name:"Trần Tuấn Lâm",cls:"12 Lí",room:"102"},
+    {name:"Cà Khôi Nguyên",cls:"12 Toán 1",room:"103"},
+    {name:"Dương Hải Duy",cls:"12 Toán 1",room:"103"},
+    {name:"Nguyễn Bình Nguyên",cls:"12 Toán 1",room:"103"},
+    {name:"Nguyễn Cao Minh Khôi",cls:"12 Toán 1",room:"103"},
+    {name:"Nguyễn Đăng Khoa",cls:"12 Toán 1",room:"103"},
+    {name:"Nguyễn Minh Quân",cls:"12 Toán 1",room:"103"},
+    {name:"Nguyễn Sỹ Dũng",cls:"12 Toán 1",room:"103"},
+    {name:"Nguyễn Trung Phong",cls:"12 Toán 1",room:"103"},
+    {name:"Điêu An Long",cls:"12 Anh 2",room:"104"},
+    {name:"Hoàng Lê Huy",cls:"12 Hóa",room:"104"},
+    {name:"Lò Bảo Tấn",cls:"12 Anh 2",room:"104"},
+    {name:"Nguyễn Đức Thái",cls:"12 Hóa",room:"104"},
+    {name:"Nguyễn Vũ Anh Tuấn",cls:"12 Hóa",room:"104"},
+    {name:"Phạm Quang Thái",cls:"12 Anh 2",room:"104"},
+    {name:"Phan Thái Sơn",cls:"12 Hóa",room:"104"},
+    {name:"Trần Lâm Vinh",cls:"12 Anh 2",room:"104"},
+    {name:"Vũ Đức Hưng",cls:"12 Hóa",room:"104"},
+    {name:"Bùi Minh Nghĩa",cls:"12 Tin",room:"105"},
+    {name:"Cao Giai Bảo",cls:"12 Tin",room:"105"},
+    {name:"Hà Chí Kiên",cls:"12 Tin",room:"105"},
+    {name:"Hoàng Hải Đăng",cls:"12 Tin",room:"105"},
+    {name:"Nguyễn Cảnh Toàn",cls:"12 Tin",room:"105"},
+    {name:"Nguyễn Huy Huy",cls:"12 Tin",room:"105"},
+    {name:"Nguyễn Tài Anh Tuấn",cls:"12 Tin",room:"105"},
+    {name:"Nguyễn Võ Thế Khôi",cls:"12 Tin",room:"105"},
+    {name:"Trần Đức Mạnh",cls:"12 Tin",room:"105"},
+    {name:"Đàm Tùng Lâm",cls:"12 Sử",room:"106"},
+    {name:"Đào Uy Quốc Bảo",cls:"12 Sử",room:"106"},
+    {name:"Đỗ Phạm Trường An",cls:"12 Sinh",room:"106"},
+    {name:"Lã Bảo Nam",cls:"12 Sử",room:"106"},
+    {name:"Lò Thiên Đăng",cls:"12 Sử",room:"106"},
+    {name:"Mai Ngọc Thao",cls:"12 Sử",room:"106"},
+    {name:"Nguyễn Huy Anh",cls:"12 Sử",room:"106"},
+    {name:"Nguyễn Nhật Dũng",cls:"12 Sử",room:"106"},
+    {name:"Nguyễn Trung Đức",cls:"12 Sinh",room:"106"},
+    {name:"Trần Đức Anh",cls:"12 Sử",room:"106"},
+    {name:"Bùi Phú Đức",cls:"12 Anh 1",room:"107"},
+    {name:"Cao Doãn Trung",cls:"12 Toán 2",room:"107"},
+    {name:"Hà Việt Thành",cls:"12 Anh 1",room:"107"},
+    {name:"Hoàng Khắc Cường",cls:"12 Anh 1",room:"107"},
+    {name:"Lò An Phú",cls:"12 Địa",room:"107"},
+    {name:"Lò Minh Khôi",cls:"12 Địa",room:"107"},
+    {name:"Nguyễn Hoàng Anh",cls:"12 Toán 2",room:"107"},
+    {name:"Nguyễn Trọng Hiếu",cls:"12 Toán 2",room:"107"},
+    {name:"Nông Tuấn Tú",cls:"12 Anh 1",room:"107"},
+    {name:"Trần Hoàng Long",cls:"12 Anh 1",room:"107"},
+    {name:"Cầm Anh Minh",cls:"11 Toán 1",room:"108"},
+    {name:"Đỗ Gia Bảo",cls:"11 Toán 1",room:"108"},
+    {name:"Nguyễn Đăng Khánh",cls:"11 Toán 1",room:"108"},
+    {name:"Nguyễn Đức Sơn",cls:"11 Toán 1",room:"108"},
+    {name:"Nguyễn Hải Đăng",cls:"11 Toán 1",room:"108"},
+    {name:"Nguyễn Hữu Bình",cls:"11 Toán 1",room:"108"},
+    {name:"Nguyễn Huy Khánh",cls:"11 Toán 1",room:"108"},
+    {name:"Nguyễn Minh Đăng",cls:"11 Toán 1",room:"108"},
+    {name:"Nguyễn Minh Đăng",cls:"11 Toán 1",room:"108"},
+    {name:"Bùi Thế Quyền",cls:"12 Hóa",room:"304"},
+    {name:"Đỗ Cao Hưng",cls:"11 Hóa",room:"304"},
+    {name:"Đoàn Tiến Dũng",cls:"11 Hóa",room:"304"},
+    {name:"Lê Quốc Khánh",cls:"11 Hóa",room:"304"},
+    {name:"Nguyễn Đức Trường",cls:"11 Hóa",room:"304"},
+    {name:"Nguyễn Ngọc Hiếu",cls:"12 Hóa",room:"304"},
+    {name:"Nguyễn Ngọc Khánh Lâm",cls:"11 Hóa",room:"304"},
+    {name:"Đinh Gia Khánh",cls:"10 Anh 2",room:"307"},
+    {name:"Đỗ Nguyễn Anh Đức",cls:"10 Anh 2",room:"307"},
+    {name:"Đỗ Việt Hưng",cls:"10 Anh 2",room:"307"},
+    {name:"Hoàng Gia Long",cls:"10 Anh 2",room:"307"},
+    {name:"Nguyễn Gia Huy",cls:"10 Anh 2",room:"307"},
+    {name:"Nguyễn Huy Vũ",cls:"10 Anh 2",room:"307"},
+    {name:"Nguyễn Minh Quân",cls:"10 Anh 2",room:"307"},
+    {name:"Nguyễn Thiên An",cls:"10 Anh 2",room:"307"},
+    {name:"Nguyễn Tùng Bách",cls:"10 Anh 2",room:"307"},
+    {name:"Vũ Bảo An",cls:"10 Anh 2",room:"307"},
+    {name:"Vũ Bảo An",cls:"10 Anh 2",room:"307"},
+    {name:"Vương Chí Thành",cls:"10 Anh 2",room:"307"},
+    {name:"Đặng Thanh Tuấn",cls:"10 Toán 1",room:"308"},
+    {name:"Lại Sơn Dương",cls:"10 Toán 1",room:"308"},
+    {name:"Nguyễn Anh Khôi",cls:"10 Toán 1",room:"308"},
+    {name:"Nguyễn Tuấn Huy",cls:"10 Toán 1",room:"308"},
+    {name:"Phạm Vũ Bảo Lâm",cls:"10 Toán 1",room:"308"},
+    {name:"Trần Hữu Phong",cls:"10 Toán 1",room:"308"},
+    {name:"Trần Tống Khánh Nam",cls:"10 Toán 1",room:"308"},
+    {name:"Trịnh Bình Minh",cls:"10 Toán 1",room:"308"},
+    {name:"Vũ Bảo Minh",cls:"10 Toán 1",room:"308"},
+    {name:"Vũ Nguyễn Duy Tùng",cls:"10 Toán 1",room:"308"},
+    {name:"Đào Tuấn Thành",cls:"10 Hóa",room:"401"},
+    {name:"Đinh Sơn An",cls:"10 Hóa",room:"401"},
+    {name:"Đinh Thái Tùng",cls:"10 Địa",room:"401"},
+    {name:"Đỗ Chí Khánh",cls:"10 Hóa",room:"401"},
+    {name:"Hoàng Duy Khánh",cls:"10 Hóa",room:"401"},
+    {name:"Khúc Ngọc Gia Khánh",cls:"10 Hóa",room:"401"},
+    {name:"Kiều Doãn Tiến",cls:"10 Hóa",room:"401"},
+    {name:"Nguyễn Việt Hoàng",cls:"10 Hóa",room:"401"},
+    {name:"Phùng Quang Trung",cls:"10 Hóa",room:"401"},
+    {name:"Trương Gia Bảo",cls:"10 Hóa",room:"401"},
+    {name:"Lê Đức Anh",cls:"10 Hóa",room:"402"},
+    {name:"Ngô Tuấn Anh",cls:"10 Hóa",room:"402"},
+    {name:"Nguyễn Đức Hoàng",cls:"10 Hóa",room:"402"},
+    {name:"Nguyễn Đức Mạnh",cls:"10 Hóa",room:"402"},
+    {name:"Nguyễn Hoàng Bách",cls:"10 Hóa",room:"402"},
+    {name:"Nguyễn Quốc Thái",cls:"10 Hóa",room:"402"},
+    {name:"Quàng Đức Hiếu",cls:"10 Hóa",room:"402"},
+    {name:"Tô Anh Quân",cls:"10 Hóa",room:"402"},
+    {name:"Trương Quang Vinh",cls:"10 Hóa",room:"402"},
+    {name:"Vì Trung Hiếu",cls:"10 Hóa",room:"402"},
+    {name:"Bùi Minh Thành Đạt",cls:"11 Địa",room:"403"},
+    {name:"Cầm Mạnh Tuấn",cls:"11 Địa",room:"403"},
+    {name:"Hà Gia Minh",cls:"11 Địa",room:"403"},
+    {name:"Lã Việt Anh",cls:"11 Địa",room:"403"},
+    {name:"Lê Đức Anh",cls:"11 Địa",room:"403"},
+    {name:"Nguyễn Ngọc Minh",cls:"11 Địa",room:"403"},
+    {name:"Nguyễn Trung Kiên",cls:"11 Địa",room:"403"},
+    {name:"Phạm Hoàng Hải",cls:"11 Địa",room:"403"},
+    {name:"Quàng Trung Dũng",cls:"11 Địa",room:"403"},
+    {name:"Trần Tuấn Hưng",cls:"11 Địa",room:"403"},
+    {name:"Trần Việt Anh",cls:"11 Địa",room:"403"},
+    {name:"Dương Văn Nam",cls:"11 Hóa",room:"404"},
+    {name:"Hoàng Minh Quân",cls:"11 Hóa",room:"404"},
+    {name:"Nguyễn Phúc Minh",cls:"11 Hóa",room:"404"},
+    {name:"Nguyễn Quang Minh",cls:"11 Hóa",room:"404"},
+    {name:"Phan Văn Tiến Đạt",cls:"11 Hóa",room:"404"},
+    {name:"Tống Gia Bảo",cls:"11 Hóa",room:"404"},
+    {name:"Bùi Tiến An",cls:"11 Lí",room:"404"},
+    {name:"Đỗ Duy Hiếu",cls:"11 Lí",room:"404"},
+    {name:"Lê Nhật Minh",cls:"11 Lí",room:"404"},
+    {name:"Lương Cao Thế Vinh",cls:"11 Lí",room:"404"},
+    {name:"Nguyễn Duy An",cls:"11 Lí",room:"404"},
+    {name:"Phan Hải Nam",cls:"11 Lí",room:"404"},
+    {name:"Trịnh Duy An Nguyên",cls:"11 Lí",room:"404"},
+    {name:"Vũ Đình Hiệp",cls:"11 Lí",room:"404"},
+    {name:"Vũ Tiến Hiệp",cls:"11 Lí",room:"404"},
+    {name:"Bùi An Phú",cls:"11 Anh 1",room:"405"},
+    {name:"Bùi Cao Phong",cls:"11 Anh 1",room:"405"},
+    {name:"Điêu Khắc Đức Minh",cls:"11 Anh 1",room:"405"},
+    {name:"Lê Hoàng Long",cls:"11 Anh 1",room:"405"},
+    {name:"Lò Khánh Huy",cls:"11 Anh 1",room:"405"},
+    {name:"Nguyễn Bảo Nam",cls:"11 Anh 1",room:"405"},
+    {name:"Nguyễn Khánh Toàn",cls:"11 Anh 1",room:"405"},
+    {name:"Thiều Quang Gia Huy",cls:"11 Anh 1",room:"405"},
+    {name:"Trần Bảo Lâm",cls:"11 Anh 1",room:"405"},
+    {name:"Hoàng Quốc Bảo",cls:"11 Sinh",room:"406"},
+    {name:"Lê Gia Huy",cls:"11 Sinh",room:"406"},
+    {name:"Bùi Đức Thịnh",cls:"11 Toán 2",room:"406"},
+    {name:"Đinh Trần Anh Hiếu",cls:"11 Toán 2",room:"406"},
+    {name:"Hồ Tùng Lâm",cls:"11 Toán 2",room:"406"},
+    {name:"Nghiêm Xuân Chí Đức",cls:"11 Toán 2",room:"406"},
+    {name:"Phạm Chí Kiên",cls:"11 Sinh",room:"406"},
+    {name:"Phạm Ngọc Minh Châu",cls:"11 Sinh",room:"406"},
+    {name:"Tòng Minh Hiển",cls:"11 Toán 2",room:"406"},
+    {name:"Trần Gia Khánh",cls:"11 Toán 2",room:"406"},
+    {name:"Trần Minh Lâm",cls:"11 Toán 2",room:"406"},
+    {name:"Đỗ Nguyễn Gia Huy",cls:"11 Tin",room:"407"},
+    {name:"Đỗ Như Long",cls:"11 Tin",room:"407"},
+    {name:"Hoàng Đỗ Phong",cls:"11 Tin",room:"407"},
+    {name:"Đinh Tiên Trí",cls:"11 Tin",room:"407"},
+    {name:"Lê Bảo Lâm",cls:"11 Tin",room:"407"},
+    {name:"Lê Hoàng Gia Bảo",cls:"11 Tin",room:"407"},
+    {name:"Lê Việt Cường",cls:"11 Tin",room:"407"},
+    {name:"Lưu Đức Vinh",cls:"11 Tin",room:"407"},
+    {name:"Nguyễn Gia Bảo Lâm",cls:"11 Tin",room:"407"},
+    {name:"Phạm Lê Thanh",cls:"11 Tin",room:"407"},
+    {name:"Phạm Minh Đức",cls:"11 Tin",room:"407"},
+    {name:"Vũ Mạnh Dũng",cls:"11 Tin",room:"407"},
+    {name:"Lò Trọng Đạt",cls:"11 Tin",room:"407"},
+    {name:"Nguyễn Huy Khánh",cls:"11 Tin",room:"407"},
+    {name:"Tống Minh Quang",cls:"11 Tin",room:"407"},
+    {name:"Đặng Minh Tiến",cls:"11 Anh 2",room:"408"},
+    {name:"Đinh La Sơn",cls:"11 Anh 2",room:"408"},
+    {name:"Nguyễn Hoàng Minh",cls:"11 Anh 2",room:"408"},
+    {name:"Nguyễn Mạnh Phong",cls:"11 Anh 2",room:"408"},
+    {name:"Nguyễn Minh Hiển",cls:"11 Anh 2",room:"408"},
+    {name:"Nguyễn Tường Minh Ngữ",cls:"11 Anh 2",room:"408"},
+    {name:"Quàng Quốc Hưng",cls:"11 Anh 2",room:"408"},
+    {name:"Trần Mạnh Hiếu",cls:"11 Anh 2",room:"408"},
+    {name:"Trần Mạnh Lâm",cls:"11 Anh 2",room:"408"},
+    {name:"Đặng Nhật Minh",cls:"10 Lí",room:"501"},
+    {name:"Đinh Hữu Hải Anh",cls:"10 Lí",room:"501"},
+    {name:"Đỗ Chấn Hưng",cls:"10 Lí",room:"501"},
+    {name:"Hà Gia Bảo",cls:"10 Lí",room:"501"},
+    {name:"Hà Minh Vũ",cls:"10 Lí",room:"501"},
+    {name:"Hoàng Lê Minh",cls:"10 Lí",room:"501"},
+    {name:"Hoàng Nguyên Bảo",cls:"10 Lí",room:"501"},
+    {name:"Lê Đăng Giàu",cls:"10 Lí",room:"501"},
+    {name:"Lê Trọng Mạnh",cls:"10 Lí",room:"501"},
+    {name:"Nguyễn Đức Gia Bảo",cls:"10 Lí",room:"501"},
+    {name:"Nguyễn Duy An",cls:"10 Lí",room:"501"},
+    {name:"Nông Quang Tùng",cls:"10 Lí",room:"501"},
+    {name:"Bùi Tùng Lâm",cls:"10 Sinh",room:"502"},
+    {name:"Cầm Quang Minh",cls:"10 Sinh",room:"502"},
+    {name:"Đặng Đức Hoàng",cls:"10 Sinh",room:"502"},
+    {name:"Hoàng Việt Thanh",cls:"10 Lí",room:"502"},
+    {name:"Lò Anh Tú",cls:"10 Lí",room:"502"},
+    {name:"Phạm Bình Minh",cls:"10 Lí",room:"502"},
+    {name:"Phạm Đàm Tuệ Đăng",cls:"10 Sinh",room:"502"},
+    {name:"Phạm Hải Bình",cls:"10 Lí",room:"502"},
+    {name:"Phan Viễn Dương",cls:"10 Lí",room:"502"},
+    {name:"Trần Đăng Khôi",cls:"10 Lí",room:"502"},
+    {name:"Trần Lê Hồng Phú",cls:"10 Sinh",room:"502"},
+    {name:"Trần Lê Thanh Quang",cls:"10 Sinh",room:"502"},
+    {name:"Trần Như Bình",cls:"10 Sinh",room:"502"},
+    {name:"Bùi Thành Phúc",cls:"10 Sử",room:"503"},
+    {name:"Đặng Đình Phúc",cls:"10 Sử",room:"503"},
+    {name:"Đặng Tùng Giang",cls:"10 Sử",room:"503"},
+    {name:"Đoàn Duy Khang",cls:"10 Sử",room:"503"},
+    {name:"Hoàng Nam Phong",cls:"10 Sử",room:"503"},
+    {name:"Lưu Thanh Tùng",cls:"10 Sử",room:"503"},
+    {name:"Nguyễn Bảo Minh",cls:"10 Sử",room:"503"},
+    {name:"Nguyễn Minh Hiếu",cls:"10 Sử",room:"503"},
+    {name:"Trần Gia Huy",cls:"10 Sử",room:"503"},
+    {name:"Trương Hữu Cường",cls:"10 Sử",room:"503"},
+    {name:"Vũ Quý Thịnh",cls:"10 Sử",room:"503"},
+    {name:"Đặng Đình Tiến",cls:"10 Tin",room:"504"},
+    {name:"Đặng Nhật Nam",cls:"10 Tin",room:"504"},
+    {name:"Hoàng Viết Hiếu",cls:"10 Tin",room:"504"},
+    {name:"Lê Đức Anh",cls:"10 Tin",room:"504"},
+    {name:"Ngô Minh Hoàng",cls:"10 Tin",room:"504"},
+    {name:"Nguyễn Bình Minh",cls:"10 Tin",room:"504"},
+    {name:"Nguyễn Cầm Minh Khánh",cls:"10 Tin",room:"504"},
+    {name:"Nguyễn Duy Thành",cls:"10 Tin",room:"504"},
+    {name:"Nguyễn Hoàng Hải",cls:"10 Tin",room:"504"},
+    {name:"Cà Trung Hải",cls:"10 Anh 1",room:"505"},
+    {name:"Đoàn Mạnh Duy",cls:"10 Anh 1",room:"505"},
+    {name:"Hà Duy Khang",cls:"10 Anh 1",room:"505"},
+    {name:"Hà Việt Hùng",cls:"10 Anh 1",room:"505"},
+    {name:"Hoàng Gia Bảo",cls:"10 Anh 1",room:"505"},
+    {name:"Hoàng Minh Đức",cls:"10 Anh 1",room:"505"},
+    {name:"Mai Chí Khang",cls:"10 Anh 1",room:"505"},
+    {name:"Nguyễn Đức Trung",cls:"10 Anh 1",room:"505"},
+    {name:"Nguyễn Huy Phúc",cls:"10 Anh 1",room:"505"},
+    {name:"Nguyễn Tường Minh",cls:"10 Anh 1",room:"505"},
+    {name:"Phương Đăng Khanh",cls:"10 Anh 1",room:"505"},
+    {name:"Trần Tiến Đạt",cls:"10 Anh 1",room:"505"},
+    {name:"Hoàng Trần Thái Hà",cls:"10 Anh 1",room:"505"},
+    {name:"Bùi Bảo Nguyên",cls:"11 Sử",room:"506"},
+    {name:"Đỗ Gia Bảo",cls:"11 Sử",room:"506"},
+    {name:"Lê Hữu Vương",cls:"11 Sử",room:"506"},
+    {name:"Lù Bảo Minh",cls:"11 Sử",room:"506"},
+    {name:"Ngô Quang Dũng",cls:"11 Sử",room:"506"},
+    {name:"Nguyễn Huy Hoàng",cls:"11 Sử",room:"506"},
+    {name:"Nguyễn Ngọc Gia Bảo",cls:"11 Sử",room:"506"},
+    {name:"Nguyễn Phúc Lâm",cls:"11 Sử",room:"506"},
+    {name:"Phạm Tuấn Tú",cls:"11 Sử",room:"506"},
+    {name:"Dương Vũ Minh",cls:"11 Sử",room:"506"},
+    {name:"Đỗ Thanh Tùng",cls:"10 Toán 2",room:"507"},
+    {name:"Lê Quế Sơn",cls:"10 Toán 2",room:"507"},
+    {name:"Nguyễn Anh Tú",cls:"10 Toán 2",room:"507"},
+    {name:"Nguyễn Minh Hiếu",cls:"10 Toán 2",room:"507"},
+    {name:"Nguyễn Việt Anh",cls:"10 Toán 2",room:"507"},
+    {name:"Phạm Bảo Hoàng Minh",cls:"10 Toán 2",room:"507"},
+    {name:"Trần Nam Giang",cls:"10 Toán 2",room:"507"},
+    {name:"Vũ Nguyễn Đức Minh",cls:"10 Toán 2",room:"507"},
+    {name:"Phạm Vũ Thái Sơn",cls:"10 Tin",room:"508"},
+    {name:"Phùng Tuấn Hưng",cls:"10 Tin",room:"508"},
+    {name:"Tòng Thiên Bảo",cls:"10 Tin",room:"508"},
+    {name:"Vũ Tấn Dũng",cls:"10 Tin",room:"508"},
+    {name:"Đinh Nguyễn Ngọc Hân",cls:"10 Tin",room:"508"},
+    {name:"Lê Tùng Lâm",cls:"10 Tin",room:"508"},
+    {name:"Nguyễn Tuấn Anh",cls:"10 Tin",room:"508"},
+    {name:"Vũ Lê Khoa",cls:"10 Tin",room:"508"},
+    {name:"Đội tuyển Lý",cls:"ĐT Lý",room:"3_NCV"},
+    {name:"Bùi Anh Đức",cls:"12 Anh 2",room:"Ở trên lớp"},
+    {name:"Đinh Hải Quang",cls:"12 Anh 2",room:"Ở trên lớp"},
+    {name:"Đỗ Anh Quân",cls:"11 Hóa",room:"Ở trên lớp"},
+    {name:"Giáp Minh Hiếu",cls:"11 Hóa",room:"Ở trên lớp"},
+    {name:"Hoàng Bình An",cls:"12 Anh 2",room:"Ở trên lớp"},
+    {name:"Hoàng Duy Tùng",cls:"12 Anh 2",room:"Ở trên lớp"},
+    {name:"Phạm Duy Quang",cls:"11 Hóa",room:"Ở trên lớp"},
+    {name:"Trần Khánh Duy",cls:"12 Hóa",room:"Ở trên lớp"},
+    {name:"Vũ Nguyễn Gia Huy",cls:"11 Hóa",room:"Ở trên lớp"},
+    {name:"Hoàng Việt",cls:"12 Anh 2",room:"Ở trên lớp"},
+    {name:"Nguyễn Gia Hiếu",cls:"12 Anh 2",room:"Ở trên lớp"},
+    {name:"Trần Đức Anh",cls:"11 Toán 2",room:"Ở trên lớp"}
+  ];
+}
+
+function defaultStudentsE() {
+  return [
+    {name:"Đoàn Thùy Dương",cls:"10 Toán 1",room:"101"},
+    {name:"Lường Diệu Linh",cls:"10 Toán 1",room:"101"},
+    {name:"Hoàng Linh Giang",cls:"10 Toán 1",room:"101"},
+    {name:"Ninh Lâm Vy",cls:"10 Toán 1",room:"101"},
+    {name:"Nguyễn Ngọc Khánh Chi",cls:"10 Toán 1",room:"101"},
+    {name:"Nguyễn Thảo Nhi",cls:"10 Toán 1",room:"101"},
+    {name:"Nguyễn Quỳnh Như",cls:"10 Toán 1",room:"101"},
+    {name:"Trần Thị Hồng Ngọc",cls:"10 Toán 2",room:"101"},
+    {name:"Nguyễn Thiên Hoa",cls:"10 Toán 2",room:"101"},
+    {name:"Nguyễn Tuệ Lâm",cls:"10 Toán 2",room:"101"},
+    {name:"Nguyễn Ngọc Diệp",cls:"10 Toán 2",room:"101"},
+    {name:"Vũ Su Mi",cls:"10 Toán 2",room:"101"},
+    {name:"Lê Phương Vy",cls:"11 Anh 1",room:"102"},
+    {name:"Đinh Bảo Ngọc",cls:"11 Anh 1",room:"102"},
+    {name:"Đỗ Thảo Nhi",cls:"11 Anh 1",room:"102"},
+    {name:"Hoàng Thu Trang",cls:"11 Anh 1",room:"102"},
+    {name:"Lừ Thị Linh Hương",cls:"11 Anh 1",room:"102"},
+    {name:"Hà Trang Như",cls:"11 Anh 1",room:"102"},
+    {name:"Phạm Khánh Huyền",cls:"11 Anh 1",room:"102"},
+    {name:"Cầm Khánh Thy",cls:"11 Anh 1",room:"102"},
+    {name:"Vũ Lê Thảo Nguyên",cls:"11 Anh 1",room:"102"},
+    {name:"Nguyễn Bảo Linh",cls:"11 Anh 1",room:"102"},
+    {name:"Hà Thị Bình An",cls:"10 Anh 1",room:"104"},
+    {name:"Lê Thanh Hà",cls:"10 Anh 1",room:"104"},
+    {name:"Tôn Nguyễn Hà Anh",cls:"10 Anh 1",room:"104"},
+    {name:"Hoàng Kiều Thái Hà",cls:"10 Anh 1",room:"104"},
+    {name:"Lò Thị Oanh",cls:"10 Anh 1",room:"104"},
+    {name:"Đỗ Thiên An",cls:"10 Anh 2",room:"104"},
+    {name:"Phạm Khánh Thy",cls:"10 Anh 2",room:"104"},
+    {name:"Hoàng Khánh Ngọc",cls:"10 Anh 2",room:"104"},
+    {name:"Lưu Nguyễn Minh Huyền",cls:"10 Anh 2",room:"104"},
+    {name:"Nguyễn Ngọc Mai",cls:"10 Anh 2",room:"104"},
+    {name:"Nguyễn Thùy Linh",cls:"10 Anh 2",room:"104"},
+    {name:"Nguyễn Bảo Trâm",cls:"10 Anh 2",room:"104"},
+    {name:"Lò Thị Vân Dung",cls:"10 Anh 2",room:"104"},
+    {name:"Bùi Hà Linh",cls:"10 Anh 2",room:"104"},
+    {name:"Nguyễn Mai Yến Như",cls:"10 Hoá",room:"105"},
+    {name:"Chu Thị Phương Linh",cls:"10 Lí",room:"105"},
+    {name:"Trần Bảo Ngọc",cls:"10 Lí",room:"105"},
+    {name:"Trần Tuệ Đan",cls:"10 Lí",room:"105"},
+    {name:"Nguyễn Thị Trà Giang",cls:"10 Lí",room:"105"},
+    {name:"Đinh Bảo Trang",cls:"10 Lí",room:"105"},
+    {name:"Lê Huyền Chi",cls:"10 Lí",room:"105"},
+    {name:"Nguyễn Phương Nga",cls:"10 Lí",room:"105"},
+    {name:"Nguyễn Thị Thùy Dung",cls:"12 Sinh",room:"105"},
+    {name:"Lò Thị Ngọc Diệp",cls:"12 Sinh",room:"105"},
+    {name:"Nguyễn Lương Châu Anh",cls:"12 Sinh",room:"105"},
+    {name:"Trần Nam Phương",cls:"12 Sinh",room:"105"},
+    {name:"Nguyễn Nguyên Nhi",cls:"12 Sinh",room:"105"},
+    {name:"Hà Như Tình",cls:"12 Sinh",room:"105"},
+    {name:"Nguyễn Phan Bảo Trâm",cls:"12 Sinh",room:"105"},
+    {name:"Nguyễn Thị Anh Thư",cls:"12 Sinh",room:"105"},
+    {name:"Trần Hoài Thương",cls:"12 Sinh",room:"105"},
+    {name:"Hoàng Thị Dịu",cls:"12 Sinh",room:"105"},
+    {name:"Trần Kỳ Phương",cls:"12 Sinh",room:"105"},
+    {name:"Nguyễn Yến Nhi",cls:"10 Văn",room:"106"},
+    {name:"Dương Ngọc Diệp",cls:"10 Văn",room:"106"},
+    {name:"Nguyễn Trần Quỳnh Hương",cls:"10 Văn",room:"106"},
+    {name:"Đoàn Phương Thảo",cls:"10 Văn",room:"106"},
+    {name:"Lường Khánh Chi",cls:"10 Văn",room:"106"},
+    {name:"Nguyễn Bích Thuỷ",cls:"10 Văn",room:"106"},
+    {name:"Nguyễn Phạm Mai Huyền",cls:"10 Văn",room:"106"},
+    {name:"Lò Khánh Diệp",cls:"10 Văn",room:"106"},
+    {name:"Phạm Minh Khuê",cls:"10 Văn",room:"106"},
+    {name:"Nguyễn Hồng Nhung",cls:"10 Văn",room:"106"},
+    {name:"Nguyễn Lê Thảo Nguyên",cls:"10 Văn",room:"106"},
+    {name:"Bùi Mai Hương",cls:"10 Văn",room:"106"},
+    {name:"Lại Như Ý",cls:"10 Văn",room:"106"},
+    {name:"Phạm Phương Quỳnh",cls:"10 Văn",room:"106"},
+    {name:"Nguyễn Phạm Bảo Lam",cls:"10 Văn",room:"106"},
+    {name:"Lê Hồng Yến Khanh",cls:"10 Văn",room:"106"},
+    {name:"Lê Thu Trang",cls:"10 Văn",room:"106"},
+    {name:"Nguyễn Diệu Anh",cls:"10 Văn",room:"106"},
+    {name:"Trần Phạm Gia Linh",cls:"12 Văn",room:"107"},
+    {name:"Phạm Thu Trang",cls:"12 Văn",room:"107"},
+    {name:"Trần Thị Tuyết Mai",cls:"12 Văn",room:"107"},
+    {name:"Vũ Khánh My",cls:"12 Văn",room:"107"},
+    {name:"Trần Hiền Anh",cls:"12 Văn",room:"107"},
+    {name:"Trần Diệp Linh",cls:"12 Văn",room:"107"},
+    {name:"Hà Thị Huyền Trang",cls:"12 Văn",room:"107"},
+    {name:"Nguyễn Ngọc Bảo Nhi",cls:"12 Văn",room:"107"},
+    {name:"Vũ Huyền Thư",cls:"12 Văn",room:"107"},
+    {name:"Nguyễn Khánh Huyền",cls:"12 Văn",room:"107"},
+    {name:"Đinh Hương Giang",cls:"12 Văn",room:"107"},
+    {name:"Đinh Thảo Nguyên",cls:"12 Văn",room:"107"},
+    {name:"Lê Quỳnh Anh",cls:"12 Văn",room:"107"},
+    {name:"Nguyễn Hải Uyên",cls:"12 Văn",room:"107"},
+    {name:"Trần Khánh Huyền",cls:"12 Văn",room:"107"},
+    {name:"Nguyễn Lê Hiền Linh",cls:"10 Sử",room:"108"},
+    {name:"Vũ Ngọc Linh",cls:"10 Sử",room:"108"},
+    {name:"Nguyễn Tùng Anh",cls:"10 Sử",room:"108"},
+    {name:"Nguyễn Thái Tuệ Lâm",cls:"10 Sử",room:"108"},
+    {name:"Phương Lê Bảo Chi",cls:"10 Sử",room:"108"},
+    {name:"Huỳnh Thùy Anh",cls:"10 Sử",room:"108"},
+    {name:"Lê Khánh Ngân",cls:"10 Sử",room:"108"},
+    {name:"Lại Thục Phương",cls:"10 Sử",room:"108"},
+    {name:"Võ Lê Bảo Trân",cls:"10 Sử",room:"108"},
+    {name:"Cao Nguyễn Bảo Châu",cls:"10 Sử",room:"108"},
+    {name:"Phạm Anh Thư",cls:"10 Sử",room:"108"},
+    {name:"Nguyễn Lê Hiền Linh",cls:"10 Sử",room:"108"},
+    {name:"Nguyễn Thùy Dương",cls:"10 Sử",room:"108"},
+    {name:"Hà Nguyễn Thiên Hà",cls:"12 Địa",room:"402"},
+    {name:"Dương Vũ Ngọc Hà",cls:"12 Địa",room:"402"},
+    {name:"Chu Thị Thanh Chúc",cls:"12 Địa",room:"402"},
+    {name:"Trần Phương Nhi",cls:"12 Địa",room:"402"},
+    {name:"Vũ Minh Châu",cls:"12 Địa",room:"402"},
+    {name:"Hà Quỳnh Dương",cls:"12 Địa",room:"402"},
+    {name:"Nguyễn Thị Uyên",cls:"12 Địa",room:"402"},
+    {name:"Nông Bảo An",cls:"12 Địa",room:"402"},
+    {name:"Lê Hà Vy",cls:"12 Địa",room:"402"},
+    {name:"Phạm Thị Thanh Phương",cls:"12 Địa",room:"402"},
+    {name:"Hoàng Hồng Phúc",cls:"12 Địa",room:"402"},
+    {name:"Vũ Khánh An",cls:"12 Lí",room:"402"},
+    {name:"Phạm Tâm Anh",cls:"12 Lí",room:"402"},
+    {name:"Lê Anh Thư",cls:"12 Lí",room:"402"},
+    {name:"Hoàng Thị Bảo Ngọc",cls:"12 Lí",room:"402"},
+    {name:"Vũ Khánh An",cls:"12 Lí",room:"402"},
+    {name:"Đào Thị Trâm Anh",cls:"12 Hóa",room:"403"},
+    {name:"Bùi Mai Phương",cls:"12 Hóa",room:"403"},
+    {name:"Nguyễn Thị Mai Anh",cls:"12 Hóa",room:"403"},
+    {name:"Đoàn Thảo My",cls:"12 Hóa",room:"403"},
+    {name:"Trần Thu Hà",cls:"12 Hóa",room:"403"},
+    {name:"Nguyễn Phương Mai",cls:"12 Hóa",room:"403"},
+    {name:"Nguyễn Thảo Chi",cls:"12 Hóa",room:"403"},
+    {name:"Đào Yến Chi",cls:"12 Hóa",room:"403"},
+    {name:"Nguyễn Phương Chi",cls:"12 Hóa",room:"403"},
+    {name:"Phùng Thanh Ngân",cls:"12 Hóa",room:"403"},
+    {name:"Vì Thị Bảo Trâm",cls:"12 Hóa",room:"403"},
+    {name:"Bùi Ngọc Mai",cls:"12 Hóa",room:"403"},
+    {name:"Phạm Diệu Linh",cls:"12 Hóa",room:"403"},
+    {name:"Nguyễn Mai Phương",cls:"12 Hóa",room:"403"},
+    {name:"Phạm Ngọc Khánh",cls:"11 Địa",room:"404"},
+    {name:"Phạm Thảo Anh",cls:"11 Địa",room:"404"},
+    {name:"Phạm Hoàng Linh",cls:"11 Địa",room:"404"},
+    {name:"Nguyễn Ngọc Thuỷ",cls:"11 Địa",room:"404"},
+    {name:"Trần Ngọc Linh",cls:"11 Địa",room:"404"},
+    {name:"Điêu Huyền Vy",cls:"11 Địa",room:"404"},
+    {name:"Quàng Thị Hiền",cls:"11 Địa",room:"404"},
+    {name:"Lù Khánh Vân",cls:"11 Địa",room:"404"},
+    {name:"Phạm Ngọc Minh Thư",cls:"11 Địa",room:"404"},
+    {name:"Lê Thị Minh Phương",cls:"11 Địa",room:"404"},
+    {name:"Nguyễn Vũ Minh Tuệ",cls:"11 Địa",room:"404"},
+    {name:"Bùi Mai Nguyên",cls:"11 Địa",room:"404"},
+    {name:"Đinh Diệu Linh",cls:"11 Địa",room:"404"},
+    {name:"Nguyễn Khánh Ly",cls:"11 Địa",room:"404"},
+    {name:"Nguyễn Xuân Hương",cls:"12 Anh 2",room:"404"},
+    {name:"Nguyễn Thanh Hương",cls:"12 Anh 2",room:"404"},
+    {name:"Nguyễn Mai Hương",cls:"12 Anh 2",room:"404"},
+    {name:"Lý Minh Tuyết",cls:"12 Anh 2",room:"404"},
+    {name:"Vũ Thị Minh Ngọc",cls:"11 Toán 1",room:"405"},
+    {name:"Nguyễn Thu Phương",cls:"11 Toán 1",room:"405"},
+    {name:"Hoàng Phương Linh",cls:"11 Toán 1",room:"405"},
+    {name:"Đào Ngọc Diệp",cls:"11 Toán 1",room:"405"},
+    {name:"Đỗ Thị Ngọc Hà",cls:"11 Toán 2",room:"405"},
+    {name:"Đào Thị Hương Giang",cls:"11 Toán 2",room:"405"},
+    {name:"Nguyễn Bảo Châu",cls:"11 Toán 2",room:"405"},
+    {name:"Đoàn Thu Trang",cls:"11 Toán 2",room:"405"},
+    {name:"Kiều Tú Linh",cls:"11 Toán 2",room:"405"},
+    {name:"Nguyễn Khánh Đan",cls:"11 Toán 2",room:"405"},
+    {name:"Phạm Quỳnh Anh",cls:"12 Anh 2",room:"405"},
+    {name:"Trương Quỳnh Hoa",cls:"12 Anh 2",room:"405"},
+    {name:"Trịnh Quỳnh Nga",cls:"12 Anh 2",room:"405"},
+    {name:"Vì Khánh Ly",cls:"12 Anh 2",room:"405"},
+    {name:"Nguyễn Bảo Khánh Ngọc",cls:"12 Anh 2",room:"405"},
+    {name:"Lê Minh Anh",cls:"12 Anh 2",room:"405"},
+    {name:"Nguyễn Thảo Nguyên",cls:"12 Anh 2",room:"405"},
+    {name:"Hoàng Phương Anh",cls:"11 Sử",room:"406"},
+    {name:"Cà Thị Hương Giang",cls:"11 Sử",room:"406"},
+    {name:"Phạm Trương Thảo Nguyên",cls:"11 Sử",room:"406"},
+    {name:"Lê Tường Vy",cls:"11 Sử",room:"406"},
+    {name:"Bùi Hoàng Linh",cls:"11 Sử",room:"406"},
+    {name:"Hoàng Ngọc Lan",cls:"11 Sử",room:"406"},
+    {name:"Nguyễn Phương Linh",cls:"11 Sử",room:"406"},
+    {name:"Cao Minh Hòa",cls:"11 Sử",room:"406"},
+    {name:"Nguyễn Vân Khánh",cls:"12 Sử",room:"406"},
+    {name:"Cà Thị Bảo Ngọc",cls:"12 Sử",room:"406"},
+    {name:"Vũ Mai Trang",cls:"12 Sử",room:"406"},
+    {name:"Quàng Trâm Anh",cls:"12 Sử",room:"406"},
+    {name:"Phạm Lan Phương",cls:"12 Sử",room:"406"},
+    {name:"Vũ Trà My",cls:"11 Sử",room:"407"},
+    {name:"Đinh Mai Lâm",cls:"11 Sử",room:"407"},
+    {name:"Bùi Phương Linh",cls:"11 Sử",room:"407"},
+    {name:"Trần Hương Giang",cls:"11 Sử",room:"407"},
+    {name:"Nguyễn Vũ Hoài Anh",cls:"11 Sử",room:"407"},
+    {name:"Nguyễn Thị Mỹ An",cls:"11 Sử",room:"407"},
+    {name:"Trần Hà Anh",cls:"11 Tin",room:"407"},
+    {name:"Trương Thảo My",cls:"11 Tin",room:"407"},
+    {name:"Ngô Bảo Hân",cls:"12 Anh 1",room:"407"},
+    {name:"Bùi Hoàng Anh",cls:"12 Anh 1",room:"407"},
+    {name:"Nguyễn Ngọc Linh Chi",cls:"12 Anh 1",room:"407"},
+    {name:"Nguyễn Thùy Hương",cls:"12 Anh 1",room:"407"},
+    {name:"Lê Ngọc Minh Châu",cls:"12 Anh 1",room:"407"},
+    {name:"Phạm Khánh Huyền",cls:"12 Anh 1",room:"407"},
+    {name:"Vũ Diệp Thùy",cls:"11 Sinh",room:"408"},
+    {name:"Hoàng Quỳnh Anh",cls:"11 Sinh",room:"408"},
+    {name:"Nguyễn Thị Hải Yến",cls:"11 Sinh",room:"408"},
+    {name:"Nguyễn Như Bảo Châu",cls:"11 Sinh",room:"408"},
+    {name:"Lê Phương Linh",cls:"11 Sinh",room:"408"},
+    {name:"Lê Hà Tuệ Lâm",cls:"11 Sinh",room:"408"},
+    {name:"Đinh Phương Thảo",cls:"11 Sinh",room:"408"},
+    {name:"Hoàng Thảo My",cls:"11 Sinh",room:"408"},
+    {name:"Quàng Bảo Trâm",cls:"11 Sinh",room:"408"},
+    {name:"Lê Phương Anh",cls:"11 Sinh",room:"408"},
+    {name:"Trần Lê Khanh",cls:"11 Sinh",room:"408"},
+    {name:"Đèo Minh Bình An",cls:"11 Sinh",room:"408"},
+    {name:"Hà Cao Bảo Bình",cls:"11 Văn",room:"501"},
+    {name:"Dương Phạm Hoài Anh",cls:"11 Văn",room:"501"},
+    {name:"Khuất Mai Linh",cls:"11 Văn",room:"501"},
+    {name:"Nguyễn Phạm Anh Thư",cls:"11 Văn",room:"501"},
+    {name:"Đào Thị Phương Uyên",cls:"11 Văn",room:"501"},
+    {name:"Phạm Ngô Bảo Uyên",cls:"11 Văn",room:"501"},
+    {name:"Phạm Nguyễn Hà My",cls:"11 Văn",room:"501"},
+    {name:"Phạm Thanh Nhàn",cls:"11 Văn",room:"501"},
+    {name:"Lò Thị Phương Thảo",cls:"11 Văn",room:"501"},
+    {name:"Nguyễn Ngọc Khánh Thy",cls:"11 Văn",room:"501"},
+    {name:"Lê Thảo Vân",cls:"11 Văn",room:"501"},
+    {name:"Trần Thu Trang",cls:"11 Văn",room:"501"},
+    {name:"Nguyễn Bảo Châu",cls:"11 Văn",room:"501"},
+    {name:"Nguyễn Bảo Minh",cls:"11 Văn",room:"501"},
+    {name:"Nguyễn Bảo Lâm",cls:"10 Trung",room:"502"},
+    {name:"Đào Thùy Dương",cls:"10 Trung",room:"502"},
+    {name:"Đỗ Hà Anh Thư",cls:"10 Trung",room:"502"},
+    {name:"Nguyễn Vân Trang",cls:"10 Trung",room:"502"},
+    {name:"Thân Trần Trúc Anh",cls:"10 Trung",room:"502"},
+    {name:"Đinh Ngọc Thu Minh",cls:"10 Trung",room:"502"},
+    {name:"Lang Trà My",cls:"10 Trung",room:"502"},
+    {name:"Nguyễn Hà Bảo Châu",cls:"10 Trung",room:"502"},
+    {name:"Nguyễn Quỳnh Hương",cls:"10 Trung",room:"502"},
+    {name:"Vũ Thị Trâm Anh",cls:"10 Trung",room:"502"},
+    {name:"Trần Thùy Nhi",cls:"10 Trung",room:"502"},
+    {name:"Khúc Ngọc Diệp",cls:"10 Trung",room:"502"},
+    {name:"Lê Thanh Loan",cls:"10 Trung",room:"503"},
+    {name:"Nguyễn Thị Thanh Huyền",cls:"10 Trung",room:"503"},
+    {name:"Bùi Tường Vi",cls:"10 Trung",room:"503"},
+    {name:"Lò Thị Nguyệt Anh",cls:"10 Trung",room:"503"},
+    {name:"Hà Thuỳ Vy",cls:"10 Trung",room:"503"},
+    {name:"Hoàng Tuệ Linh",cls:"10 Trung",room:"503"},
+    {name:"Nguyễn Hoài Anh",cls:"10 Trung",room:"503"},
+    {name:"Nguyễn Bảo An",cls:"10 Trung",room:"503"},
+    {name:"Lù Nguyễn Bảo Ngọc",cls:"10 Trung",room:"503"},
+    {name:"Nhâm Tường Vy",cls:"10 Trung",room:"503"},
+    {name:"Đinh Ngọc Thu Minh",cls:"10 Trung",room:"503"},
+    {name:"Bùi Tường Vi",cls:"10 Trung",room:"503"},
+    {name:"Nguyễn Mai Linh",cls:"11 Anh 2",room:"504"},
+    {name:"Ngô Bảo Anh",cls:"11 Anh 2",room:"504"},
+    {name:"Dư Hải Vân",cls:"11 Anh 2",room:"504"},
+    {name:"Trịnh Phương Chi",cls:"11 Anh 2",room:"504"},
+    {name:"Nguyễn Minh Anh",cls:"11 Anh 2",room:"504"},
+    {name:"Ngô Bảo Châu",cls:"11 Anh 2",room:"504"},
+    {name:"Bàn Trà My",cls:"11 Anh 2",room:"504"},
+    {name:"Nguyễn Khánh Linh",cls:"11 Anh 2",room:"504"},
+    {name:"Quàng Lò Linh Chi",cls:"11 Anh 2",room:"504"},
+    {name:"Trần Hương Giang",cls:"11 Anh 2",room:"504"},
+    {name:"Kiều Diễm My",cls:"11 Anh 2",room:"504"},
+    {name:"Nguyễn Ngọc Diệp",cls:"11 Hóa",room:"505"},
+    {name:"Đào Thị Ngọc Ánh",cls:"11 Hóa",room:"505"},
+    {name:"Đoàn Thị Tuyết Minh",cls:"11 Hóa",room:"505"},
+    {name:"Vũ Thị Ngọc Nhi",cls:"11 Hóa",room:"505"},
+    {name:"Nguyễn Quỳnh Anh",cls:"11 Hóa",room:"505"},
+    {name:"Nguyễn Khánh Ngọc",cls:"11 Hóa",room:"505"},
+    {name:"Đinh Tuệ Đan",cls:"11 Hóa",room:"505"},
+    {name:"Đào Ngọc Hà",cls:"11 Hóa",room:"505"},
+    {name:"Nguyễn Ngọc Điệp",cls:"11 Hóa",room:"505"},
+    {name:"Nguyễn Phương Linh",cls:"11 Lí",room:"505"},
+    {name:"Vũ Phạm Quỳnh Anh",cls:"11 Lí",room:"505"},
+    {name:"Trần Triệu Vi",cls:"10 Địa",room:"506"},
+    {name:"Nguyễn Phương Thảo",cls:"10 Địa",room:"506"},
+    {name:"Dương Đinh Trà Giang",cls:"10 Địa",room:"506"},
+    {name:"Lê Thị Minh Ngọc",cls:"10 Địa",room:"506"},
+    {name:"Nguyễn Hà Bảo Anh",cls:"10 Địa",room:"506"},
+    {name:"Nguyễn Thùy Dương",cls:"10 Địa",room:"506"},
+    {name:"Lò Thị Thiên Kim",cls:"10 Địa",room:"506"},
+    {name:"Lò Thùy Linh",cls:"10 Địa",room:"506"},
+    {name:"Nguyễn Minh Huyền",cls:"10 Địa",room:"506"},
+    {name:"Đèo Thị Kỳ Duyên",cls:"10 Địa",room:"506"},
+    {name:"Chu Mai Anh",cls:"10 Địa",room:"506"},
+    {name:"Ưng Mai Trang",cls:"10 Sinh",room:"507"},
+    {name:"Vũ Nguyễn Minh Ngân",cls:"10 Sinh",room:"507"},
+    {name:"Đinh Tố Uyên",cls:"10 Sinh",room:"507"},
+    {name:"Hoàng Thanh Hà",cls:"10 Sinh",room:"507"},
+    {name:"Ngô Ngọc Thảo",cls:"10 Sinh",room:"507"},
+    {name:"Nguyễn Thị Mai Anh",cls:"10 Sinh",room:"507"},
+    {name:"Vì Bảo An",cls:"10 Sinh",room:"507"},
+    {name:"Nguyễn Thị Khánh Ngân",cls:"10 Sinh",room:"507"},
+    {name:"Bùi Phương Vy",cls:"10 Sinh",room:"507"},
+    {name:"Đào Nguyên Thảo",cls:"10 Sinh",room:"507"},
+    {name:"Nguyễn Thị Thủy Tiên",cls:"10 Sinh",room:"507"},
+    {name:"Nguyễn Diệu Linh",cls:"10 Sinh",room:"508"},
+    {name:"Trần Diệu Hương",cls:"10 Sinh",room:"508"},
+    {name:"Lê Ngọc Diệp",cls:"10 Sinh",room:"508"},
+    {name:"Nguyễn Vũ Bình An",cls:"10 Sinh",room:"508"},
+    {name:"Nguyễn Thị Phương Linh",cls:"10 Sinh",room:"508"},
+    {name:"Nguyễn Tường Vi",cls:"10 Sinh",room:"508"},
+    {name:"Nguyễn Minh Thư",cls:"10 Tin",room:"508"},
+    {name:"Đinh Nguyễn Ngọc Hân",cls:"10 Tin",room:"508"},
+    {name:"Nguyễn Thị Minh Nguyệt",cls:"10 Tin",room:"508"},
+    {name:"Đèo Hải Vy",cls:"10 Tin",room:"508"},
+    {name:"Vũ Hương Nhi",cls:"12 Toán 1",room:"508"},
+    {name:"Trần Vũ Hà My",cls:"12 Toán 1",room:"508"},
+    {name:"Phan Mai Phương",cls:"12 Toán 1",room:"508"},
+    {name:"Trần Yến Vy",cls:"12 Toán 1",room:"508"},
+    {name:"Lê Hà Vy",cls:"12 Toán 2",room:"508"},
+    {name:"Dương Quỳnh Nhi",cls:"12 Toán 2",room:"508"},
+    {name:"Nguyễn Hoàng Bảo Ngọc",cls:"11 Lí",room:"Ở trên lớp"},
+    {name:"Trần Trà My",cls:"11 Lí",room:"Ở trên lớp"},
+    {name:"Đèo Hải Vy",cls:"11 Tin",room:"Ở trên lớp"},
+    {name:"Nguyễn Minh Châu",cls:"12 Anh 1",room:"Ở trên lớp"},
+    {name:"Nguyễn Phương Trang",cls:"12 Sử",room:"Ở trên lớp"},
+    {name:"Lý Phương Chi",cls:"12 Sử",room:"Ở trên lớp"},
+    {name:"Phạm Phương Nguyên",cls:"12 Sử",room:"Ở trên lớp"},
+    {name:"Tòng Thị Kim Ngân",cls:"12 Tin",room:"Ở trên lớp"},
+    {name:"Dương Thị Yến Nhi",cls:"12 Tin",room:"Ở trên lớp"},
+    {name:"Phạm Minh Châu",cls:"12 Tin",room:"Ở trên lớp"}
+  ];
+}
+
+// Start app
+initSystem();
+</script>
+</body>
+</html>

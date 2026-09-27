@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nền tảng Quản trị Bán trú Trường học</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #f3f4f6;
+        }
+
+        /* Thanh điều hướng bên trái */
+        .platform-sidebar {
+            width: 250px;
+            background-color: #1e1e2f;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .platform-logo {
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border-bottom: 1px solid #2a2a40;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #4ade80; /* Màu xanh ngọc */
+        }
+
+        .platform-menu {
+            display: flex;
+            flex-direction: column;
+            padding: 15px 0;
+            flex: 1;
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            color: #a0a0b0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background-color: #2a2a40;
+            color: white;
+        }
+
+        .menu-item.active {
+            background-color: #2a2a40;
+            color: white;
+            border-left-color: #4ade80;
+            font-weight: 600;
+        }
+
+        .platform-footer {
+            padding: 20px;
+            font-size: 12px;
+            color: #6a6a80;
+            border-top: 1px solid #2a2a40;
+            text-align: center;
+        }
+
+        /* Khu vực hiển thị ứng dụng */
+        .platform-content {
+            flex: 1;
+            position: relative;
+            background-color: #ffffff;
+        }
+
+        /* Iframe chứa các web con */
+        .app-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .app-frame.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR NỀN TẢNG -->
+    <nav class="platform-sidebar">
+        <div class="platform-logo">
+            <i class="fa-solid fa-school"></i>
+            Hệ sinh thái Bán trú
+        </div>
+        
+        <div class="platform-menu">
+            <div class="menu-item active" onclick="switchApp('app-quan-ly', this)">
+                <i class="fa-solid fa-users"></i>
+                Quản lý Học sinh
+            </div>
+            <div class="menu-item" onclick="switchApp('app-xep-lich', this)">
+                <i class="fa-solid fa-calendar-alt"></i>
+                Phân công Lịch trực
+            </div>
+        </div>
+
+        <div class="platform-footer">
+            THPT Chuyên Sơn La<br>Năm học 2026-2027
+        </div>
+    </nav>
+
+    <!-- KHU VỰC HIỂN THỊ CÁC WEB CON -->
+    <main class="platform-content">
+        <!-- Chú ý: src trỏ tới tên 2 file HTML bạn đã tạo -->
+        <iframe src="quan-ly.html" id="app-quan-ly" class="app-frame active"></iframe>
+        <iframe src="xep-lich.html" id="app-xep-lich" class="app-frame"></iframe>
+    </main>
+
+    <script>
+        function switchApp(appId, menuItem) {
+            // 1. Cập nhật trạng thái menu
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            menuItem.classList.add('active');
+
+            // 2. Chuyển đổi hiển thị iframe
+            document.querySelectorAll('.app-frame').forEach(frame => {
+                frame.classList.remove('active');
+            });
+            document.getElementById(appId).classList.add('active');
+        }
+    </script>
+
+</body>
+</html>

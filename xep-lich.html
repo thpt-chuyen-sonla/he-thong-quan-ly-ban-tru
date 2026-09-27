@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Xếp Lịch Trực Bán Trú</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Animation for Randomizer */
+        .slot-machine-text { animation: slotSpin 0.1s linear infinite; }
+        @keyframes slotSpin {
+            0% { transform: translateY(-5px); opacity: 0.5; }
+            50% { transform: translateY(0px); opacity: 1; }
+            100% { transform: translateY(5px); opacity: 0.5; }
+        }
+
+        /* Custom Select/Dropdown styles */
+        .custom-dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 100%;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+            z-index: 50;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            top: 100%; /* Push below input */
+            left: 0;
+        }
+        .custom-dropdown-content a {
+            color: black;
+            padding: 8px 12px;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .custom-dropdown-content a:hover { background-color: #f3f4f6; color: #4f46e5; font-weight: 500; }
+        .show-dropdown { display: block; }
+        
+        /* Highlight row */
+        .highlight-row { animation: highlightFlash 1s ease-out; }
+        @keyframes highlightFlash {
+            0% { background-color: #e0e7ff; }
+            100% { background-color: transparent; }
+        }
+
+        /* Line clamp for report preview */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Report save button animation */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        [id^="report-btn-"]:not(.hidden) {
+            animation: fadeInUp 0.18s ease-out;
+        }
+
+        /* Responsive: drawer trái/phải trên điện thoại & máy tính bảng (< lg) */
+        html, body { overflow-x: hidden; }
+        #left-sidebar, #right-sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        @media (max-width: 1023.98px) {
+            #left-sidebar, #right-sidebar { position: fixed; top: 0; height: 100%; }
+            #left-sidebar { left: 0; }
+            #right-sidebar { right: 0; }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col lg:flex-row overflow-hidden text-slate-800">
+
+    <!-- Overlay dùng cho drawer trên di động/tablet -->
+    <div id="drawer-overlay" onclick="closeAllDrawers()" class="fixed inset-0 bg-slate-900/50 z-30 hidden lg:hidden"></div>
+
+    <!-- LEFT MENU: Dashboard & Weeks -->
+    <aside id="left-sidebar" class="w-72 max-w-[85vw] bg-white border-r border-slate-200 flex flex-col h-full z-40 shadow-2xl lg:shadow-sm transform -translate-x-full lg:translate-x-0">
+        <div class="p-4 border-b border-slate-200 bg-indigo-600 text-white flex justify-between items-center">
+            <h2 class="font-bold text-lg"><i class="fa-solid fa-calendar-days mr-2"></i>Bảng Điều Khiển</h2>
+            <button onclick="closeAllDrawers()" class="lg:hidden text-white/80 hover:text-white w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 transition-colors" title="Đóng">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        
+        <!-- Add/Remove Week Controls -->
+        <div class="p-3 border-b border-slate-100 flex gap-2 bg-slate-50">
+            <input type="number" id="new-week-input" placeholder="Nhập số tuần..." class="w-full border border-slate-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500">
+            <button onclick="addWeek()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-sm transition-colors shadow-sm" title="Thêm tuần">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+        </div>
+
+        <div class="px-4 py-2 bg-slate-100/50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Danh sách Tuần học
+        </div>
+        
+        <!-- Weeks List Container -->
+        <div id="weeks-list" class="flex-1 overflow-y-auto p-2 space-y-1">
+            <!-- Weeks will be injected here -->
+        </div>
+    </aside>
+
+    <!-- CENTER: Main Board -->
+    <main class="flex-1 flex flex-col h-full bg-slate-50/50 relative">
+        <!-- Header -->
+        <header class="min-h-[4rem] border-b border-slate-200 bg-white flex flex-wrap items-center justify-between gap-y-2 gap-x-3 px-3 sm:px-6 py-2.5 shadow-sm">
+            <div class="flex items-center gap-1.5 sm:gap-3 min-w-0">
+                <button onclick="toggleLeftSidebar()" class="lg:hidden flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-indigo-600 transition-colors" title="Danh sách tuần">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 id="center-title" class="text-base sm:text-xl font-bold text-slate-700 truncate">Vui lòng chọn một tuần bên trái</h1>
+            </div>
+            <div class="flex gap-2 items-center flex-wrap justify-end">
+                <button onclick="openAddDaysModal()" id="btn-add-days" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors shadow-sm items-center whitespace-nowrap">
+                    <i class="fa-solid fa-calendar-plus mr-1.5 sm:mr-2"></i> Thêm ngày trực
+                </button>
+                <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors shadow-sm flex items-center whitespace-nowrap">
+                    <i class="fa-solid fa-file-excel mr-1.5 sm:mr-2"></i> Xuất Excel
+                </button>
+                <button onclick="toggleRightSidebar()" class="lg:hidden flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-indigo-600 transition-colors" title="DS trực tuần & Thống kê">
+                    <i class="fa-solid fa-list-ul"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Days Grid -->
+        <div class="flex-1 overflow-y-auto p-3 sm:p-6 relative">
+            <div id="days-container" class="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4 sm:gap-6 max-w-7xl mx-auto hidden pb-20">
+                <!-- Days will be generated here -->
+            </div>
+            
+            <!-- Empty State -->
+            <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
+                <i class="fa-regular fa-folder-open text-6xl mb-4 text-slate-300"></i>
+                <p class="text-lg" id="empty-state-text">Chọn một tuần ở menu trái để bắt đầu</p>
+            </div>
+        </div>
+
+        <!-- Randomizer Overlay -->
+        <div id="randomizer-overlay" class="absolute inset-0 bg-slate-900/80 hidden flex-col items-center justify-center z-40 transition-opacity px-4">
+            <h2 class="text-white text-xl sm:text-3xl font-bold mb-6 sm:mb-8 drop-shadow-lg text-center">Đang chọn tổ phân công ngẫu nhiên...</h2>
+            <div class="flex flex-col sm:flex-row gap-4 sm:gap-8 w-full max-w-xs sm:max-w-none items-center justify-center">
+                <div class="bg-white rounded-2xl shadow-[0_0_40px_rgba(99,102,241,0.4)] p-5 sm:p-8 w-full sm:w-80 flex items-center justify-center h-28 sm:h-48 border-4 border-indigo-500 overflow-hidden relative transform transition-transform">
+                    <span id="slot-1" class="text-xl sm:text-3xl font-black text-indigo-700 text-center w-full absolute px-2">Toán - Tin</span>
+                </div>
+                <div class="bg-white rounded-2xl shadow-[0_0_40px_rgba(236,72,153,0.4)] p-5 sm:p-8 w-full sm:w-80 flex items-center justify-center h-28 sm:h-48 border-4 border-pink-500 overflow-hidden relative transform transition-transform">
+                    <span id="slot-2" class="text-xl sm:text-3xl font-black text-pink-600 text-center w-full absolute px-2">Văn - Thư viện</span>
+                </div>
+            </div>
+            <div class="mt-6 sm:mt-8 text-indigo-200 text-xs sm:text-base text-center animate-pulse bg-slate-800/50 px-4 sm:px-6 py-2 rounded-full backdrop-blur-sm max-w-[92vw]">
+                <i class="fa-solid fa-spinner fa-spin mr-2"></i>Hệ thống đang tính toán ưu tiên cân bằng tải theo nhân sự...
+            </div>
+        </div>
+    </main>
+
+    <!-- RIGHT MENU: Summary & Stats Dashboard -->
+    <aside id="right-sidebar" class="w-[24rem] max-w-[85vw] bg-white border-l border-slate-200 flex flex-col h-full shadow-2xl lg:shadow-sm z-40 transform translate-x-full lg:translate-x-0">
+        <!-- Header Panel -->
+        <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between gap-2">
+            <button onclick="closeAllDrawers()" class="lg:hidden text-slate-500 hover:text-red-500 w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 transition-colors flex-shrink-0" title="Đóng">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h2 class="font-bold text-lg text-slate-800 truncate flex-1"><i class="fa-solid fa-users-viewfinder mr-2 text-indigo-600"></i>DS Trực Tuần</h2>
+            <span id="right-panel-week-badge" class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded shadow-sm border border-indigo-200 flex-shrink-0">Chưa chọn</span>
+        </div>
+
+        <!-- Weekly Summary -->
+        <div class="flex-1 overflow-y-auto p-4 border-b border-slate-200 bg-white">
+            <div id="weekly-summary-list" class="space-y-3">
+                <div class="flex flex-col items-center justify-center text-slate-400 text-center h-full mt-10">
+                    <i class="fa-solid fa-list-check text-4xl mb-3 text-slate-300"></i>
+                    <p class="text-sm">Phân công trực ở màn hình chính<br>để xem danh sách tổng hợp tại đây.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overall Stats -->
+        <div class="h-[45%] min-h-[300px] flex flex-col bg-slate-50 border-t border-slate-200">
+            <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center">
+                <h3 class="font-bold text-slate-700 text-sm flex items-center uppercase tracking-wide">
+                    <i class="fa-solid fa-chart-pie mr-2 text-emerald-500"></i>Thống kê số buổi trực
+                </h3>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4">
+                <div id="stats-container" class="space-y-2">
+                    <!-- Stats injected here -->
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Custom Modal -->
+    <div id="custom-modal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-[26rem] max-w-[92%] max-h-[85vh] overflow-y-auto overflow-x-hidden transform scale-95 transition-transform duration-200" id="modal-content">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center">
+                <div id="modal-icon" class="mr-3 text-2xl text-blue-500"><i class="fa-solid fa-circle-info"></i></div>
+                <h3 id="modal-title" class="text-lg font-bold text-slate-800">Thông báo</h3>
+            </div>
+            <div class="px-6 py-5">
+                <p id="modal-message" class="text-slate-600 text-[15px] leading-relaxed"></p>
+            </div>
+            <div class="px-6 py-4 bg-slate-50 flex justify-end gap-3 border-t border-slate-100" id="modal-actions">
+                <button onclick="closeModal()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors shadow-sm">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Days Modal -->
+    <div id="add-days-modal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-[28rem] max-w-[92%] max-h-[85vh] overflow-y-auto overflow-x-hidden transform scale-95 transition-transform duration-200" id="add-days-content">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50 sticky top-0 z-10">
+                <h3 class="text-lg font-bold text-slate-800"><i class="fa-regular fa-calendar-plus text-blue-600 mr-2"></i>Thêm ngày trực cho Tuần</h3>
+                <button onclick="closeAddDaysModal()" class="text-slate-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-slate-500 mb-5">Đánh dấu vào các ngày có tổ chức học bán trú để tạo thẻ phân công trên màn hình chính.</p>
+                <div id="days-checkbox-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- Checkboxes injected here -->
+                </div>
+            </div>
+            <div class="px-6 py-4 bg-slate-50 flex justify-end gap-3 border-t border-slate-100">
+                <button onclick="closeAddDaysModal()" class="px-5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-md transition-colors">Hủy</button>
+                <button onclick="saveActiveDays()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors shadow-sm"><i class="fa-solid fa-check mr-2"></i>Lưu các ngày</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Variables
+        const appId = 'bt-scheduler-app'; // Root path for Firestore collections
+        
+        // Firebase Config do User cung cấp
+        const firebaseConfig = {
+            apiKey: "AIzaSyASK5spRICURCtBZg14Nf952x2fv2FKeFw",
+            authDomain: "phanconglichtrucbantru.firebaseapp.com",
+            databaseURL: "https://phanconglichtrucbantru-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "phanconglichtrucbantru",
+            storageBucket: "phanconglichtrucbantru.firebasestorage.app",
+            messagingSenderId: "894167916195",
+            appId: "1:894167916195:web:6bc91dac0eb4fc3e596916"
+        };
+        // =========================================================================
+
+        let db, auth;
+
+        const DAYS_OF_WEEK = [
+            { id: 2, name: 'Thứ 2' }, { id: 3, name: 'Thứ 3' }, { id: 4, name: 'Thứ 4' },
+            { id: 5, name: 'Thứ 5' }, { id: 6, name: 'Thứ 6' }, { id: 7, name: 'Thứ 7' },
+            { id: 8, name: 'Chủ Nhật' }
+        ];
+
+        const RAW_TEACHERS = [
+            { name: "Mai Thị Chúc Bình", dept: "Toán - Tin" }, { name: "Lưu Thế Dũng", dept: "Toán - Tin" },
+            { name: "Nguyễn Thị Anh Đào", dept: "Toán - Tin" }, { name: "Nguyễn Thúy Hà", dept: "Toán - Tin" },
+            { name: "Nguyễn Thị Hằng", dept: "Toán - Tin" }, { name: "Nguyễn Thái Học", dept: "Toán - Tin" },
+            { name: "Lê Thị Thanh Huyền", dept: "Toán - Tin" }, { name: "Đào Duy Long", dept: "Toán - Tin" },
+            { name: "Vũ Văn Nam", dept: "Toán - Tin" }, { name: "Đào Thị Phương", dept: "Toán - Tin" },
+            { name: "Nguyễn Thị Phượng", dept: "Toán - Tin" }, { name: "Vũ Thị Phương Thảo", dept: "Toán - Tin" },
+            { name: "Nguyễn Xuân Thắng", dept: "Toán - Tin" }, { name: "Lê Thị Kim Thoa", dept: "Toán - Tin" },
+            { name: "Đặng Xuân Vương", dept: "Toán - Tin" }, { name: "Trần Thị Lan", dept: "Toán - Tin" },
+            { name: "Đỗ Văn Pun", dept: "Toán - Tin" }, { name: "Trương Thị Tiến", dept: "Toán - Tin" },
+            { name: "Lò Thùy Trang", dept: "Toán - Tin" }, { name: "Nguyễn Thị Thu Vinh", dept: "Toán - Tin" },
+            { name: "Nguyễn Thanh Bình", dept: "Văn - Thư viện" }, { name: "Tạ Thị Cẩm", dept: "Văn - Thư viện" },
+            { name: "Đỗ Thị Dung", dept: "Văn - Thư viện" }, { name: "Nguyễn Thị Hương Giang", dept: "Văn - Thư viện" },
+            { name: "Hà Thị Hải", dept: "Văn - Thư viện" }, { name: "Phùng Thị Bích Hạnh", dept: "Văn - Thư viện" },
+            { name: "Đặng Bảo Ngọc", dept: "Văn - Thư viện" }, { name: "Nguyễn Thị Bích Ngọc", dept: "Văn - Thư viện" },
+            { name: "Lê Thị Thảo", dept: "Văn - Thư viện" }, { name: "Đinh Thị Hoài Thu", dept: "Văn - Thư viện" },
+            { name: "Nguyễn Thị Hải Thu", dept: "Văn - Thư viện" }, { name: "Nguyễn Thị Bích Hạnh", dept: "Tiếng Anh - Âm nhạc" },
+            { name: "Nguyễn Thị Thu Hiền", dept: "Tiếng Anh - Âm nhạc" }, { name: "Đinh Thị Hồng", dept: "Tiếng Anh - Âm nhạc" },
+            { name: "Bùi Thị Minh Huyền", dept: "Tiếng Anh - Âm nhạc" }, { name: "Hà Huy Khánh", dept: "Tiếng Anh - Âm nhạc" },
+            { name: "Nguyễn Hà My", dept: "Tiếng Anh - Âm nhạc" }, { name: "Hoàng Thị Hằng Nga", dept: "Tiếng Anh - Âm nhạc" },
+            { name: "Nguyễn Hồng Ngọc", dept: "Tiếng Anh - Âm nhạc" }, { name: "Đào Thúy Quyên", dept: "Tiếng Anh - Âm nhạc" },
+            { name: "Đào Thị Thu", dept: "Tiếng Anh - Âm nhạc" }, { name: "Phạm Xuân Vũ", dept: "Tiếng Anh - Âm nhạc" },
+            { name: "Hoàng Thị Thêu", dept: "Tiếng Anh - Âm nhạc" }, { name: "Đinh Đức Cường", dept: "Lý - Thiết bị" },
+            { name: "Nguyễn Thị Đào", dept: "Lý - Thiết bị" }, { name: "Phạm Ngọc Hà", dept: "Lý - Thiết bị" },
+            { name: "Nguyễn Thị Hạnh", dept: "Lý - Thiết bị" }, { name: "Trần Thị Hảo", dept: "Lý - Thiết bị" },
+            { name: "Ngô Quang Tuấn", dept: "Lý - Thiết bị" }, { name: "Dương Tú Vân", dept: "Lý - Thiết bị" },
+            { name: "Dương Hoàng Yến", dept: "Lý - Thiết bị" }, { name: "Nguyễn Thị Hiền", dept: "Lý - Thiết bị" },
+            { name: "Cà Hoa Ban", dept: "Hóa - Thiết bị" }, { name: "Đinh Thị Thanh Dung", dept: "Hóa - Thiết bị" },
+            { name: "Lê Thị Thu Hà", dept: "Hóa - Thiết bị" }, { name: "Nguyễn Ngọc Lan", dept: "Hóa - Thiết bị" },
+            { name: "Đỗ Trường Sơn", dept: "Hóa - Thiết bị" }, 
+            { name: "Trần Anh Tuấn", dept: "Hóa - Thiết bị" }, { name: "Nguyễn Hải Yến", dept: "Hóa - Thiết bị" },
+            { name: "Nguyễn Phi Hùng", dept: "Sinh - Công nghệ" },
+            { name: "Đoàn Văn Thắng", dept: "Sinh - Công nghệ" }, { name: "Lê Thu Hà", dept: "Sinh - Công nghệ" },
+            { name: "Điêu Thị Nhiên", dept: "Sinh - Công nghệ" }, { name: "Phạm Thị Minh Thảo", dept: "Sinh - Công nghệ" },
+            { name: "Trịnh Thị Thủy", dept: "Sinh - Công nghệ" }, { name: "Ngô Thị Thu Trang", dept: "Sinh - Công nghệ" },
+            { name: "Cầm Thị Hường", dept: "Sinh - Công nghệ" }, { name: "Nguyễn Thị Huyền Dương", dept: "Sử - Địa" },
+            { name: "Vũ Thanh Hòa", dept: "Sử - Địa" }, { name: "Lù Văn Thành", dept: "Sử - Địa" },
+            { name: "Phạm Thị Thúy", dept: "Sử - Địa" }, { name: "Nguyễn Quốc Định", dept: "Sử - Địa" },
+            { name: "Lương Thị Thu Hà", dept: "Sử - Địa" }, { name: "Sa Thị Thu Hằng", dept: "Sử - Địa" },
+            { name: "Đặng Thị Thu Hiền", dept: "Sử - Địa" }, { name: "Trần Thị Lan Hương", dept: "Sử - Địa" },
+            { name: "Cầm Thị Dương Thúy", dept: "Sử - Địa" }, { name: "Bùi Văn Định", dept: "GDTC-GDQP-AN" },
+            { name: "Lương Thị Hiên", dept: "GDTC-GDQP-AN" }, { name: "Mai Hải Lê", dept: "GDTC-GDQP-AN" },
+            { name: "Nguyễn Phương Nam", dept: "GDTC-GDQP-AN" }, { name: "Phùng Quang Ngọc", dept: "GDTC-GDQP-AN" },
+            { name: "Lò Thanh Sơn", dept: "GDTC-GDQP-AN" }, { name: "Ngô Văn Thanh", dept: "GDTC-GDQP-AN" },
+            { name: "Nguyễn Cao Dư", dept: "VP-GDKT&PL" }, { name: "Nguyễn Hải Giang", dept: "VP-GDKT&PL" },
+            { name: "Trần Thị Hoàn", dept: "VP-GDKT&PL" }
+        ];
+
+        // Trích xuất mảng Tổ duy nhất
+        const DEPARTMENTS = [...new Set(RAW_TEACHERS.map(t => t.dept))];
+        
+        // BƯỚC 1: Khởi tạo mảng lưu kích thước (số lượng giáo viên) của mỗi tổ
+        const DEPT_SIZES = {};
+        RAW_TEACHERS.forEach(t => {
+            DEPT_SIZES[t.dept] = (DEPT_SIZES[t.dept] || 0) + 1;
+        });
+
+        let state = {
+            weeks: Array.from({length: 33}, (_, i) => i + 5), // Tuần 5 đến 37
+            selectedWeek: null,
+            schedules: {}, // { "w5_d2": { week, dayId, dept1, dept2, t1, t2 } }
+            isAnimating: false,
+            deptStats: {}
+        };
+        
+        let currentRenderHash = ""; // Dùng để theo dõi xem có cần vẽ lại thẻ Ngày hay không
+
+        // DOM Elements
+        const elWeeksList = document.getElementById('weeks-list');
+        const elDaysContainer = document.getElementById('days-container');
+        const elEmptyState = document.getElementById('empty-state');
+        const elCenterTitle = document.getElementById('center-title');
+        const elRandomizer = document.getElementById('randomizer-overlay');
+        const elStatsContainer = document.getElementById('stats-container');
+        const elWeeklySummary = document.getElementById('weekly-summary-list');
+
+        async function initApp() {
+            // LUÔN LUÔN VẼ UI TRƯỚC ĐỂ NGƯỜI DÙNG KHÔNG BỊ CHỜ
+            renderWeeks();
+            calculateStats(); // Draw empty stats
+            
+            if (firebaseConfig && firebaseConfig.projectId) {
+                try {
+                    const app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+                    
+                    try {
+                        // Thêm Timeout 5 giây: Nếu mạng lỗi hoặc Firebase chưa bật Auth, 
+                        // nó sẽ tự động bỏ qua để không làm treo ứng dụng
+                        await Promise.race([
+                            signInAnonymously(auth),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error("Auth timeout")), 5000))
+                        ]);
+                    } catch (authErr) {
+                        console.warn("Lỗi Auth hoặc timeout. Bỏ qua và kết nối DB...", authErr);
+                    }
+                    
+                    setupRealtimeListeners();
+                } catch (error) {
+                    console.error("Firebase Init Error:", error);
+                    showToast("Chạy ở chế độ ngoại tuyến. Lỗi: " + error.message, "warning");
+                }
+            } else {
+                showToast("Chạy ở chế độ ngoại tuyến (Chưa cấu hình Cloud).", "warning");
+            }
+        }
+
+        function setupRealtimeListeners() {
+            if(!db) return;
+
+            // 1. Lắng nghe dữ liệu cấu hình tuần
+            const weeksRef = collection(db, 'artifacts', appId, 'public', 'data', 'config');
+            onSnapshot(weeksRef, (snapshot) => {
+                let found = false;
+                snapshot.forEach(doc => {
+                    if (doc.id === 'weeksConfig') {
+                        state.weeks = doc.data().weeks || state.weeks;
+                        found = true;
+                    }
+                });
+                state.weeks.sort((a, b) => a - b);
+                
+                if(!found && state.weeks.length > 0) {
+                     setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'weeksConfig'), { weeks: state.weeks }).catch(e=>console.error(e));
+                }
+                renderWeeks();
+            }, (error) => {
+                console.error("Lỗi Firestore (Config):", error);
+                showToast("Lỗi kết nối CSDL! Hãy kiểm tra bạn đã tạo Firestore chưa.", "error");
+            });
+
+            // 2. Lắng nghe toàn bộ lịch trực
+            const schedulesRef = collection(db, 'artifacts', appId, 'public', 'data', 'schedules');
+            onSnapshot(schedulesRef, (snapshot) => {
+                state.schedules = {};
+                snapshot.forEach(doc => {
+                    state.schedules[doc.id] = doc.data();
+                });
+                
+                calculateStats(); // Cập nhật lại số liệu thống kê
+                
+                if(state.selectedWeek) {
+                    smartRenderDays(); // Vẽ lại giao diện giữa mà không làm mất focus chuột
+                    renderRightSummary(); // Vẽ lại giao diện bên phải
+                }
+            }, (error) => {
+                console.error("Lỗi Firestore (Lịch):", error);
+            });
+        }
+
+        window.renderWeeks = function() {
+            elWeeksList.innerHTML = '';
+            state.weeks.forEach(w => {
+                const div = document.createElement('div');
+                const isSelected = state.selectedWeek === w;
+                
+                // CSS class thay đổi tùy theo việc có được chọn hay không
+                div.className = `flex justify-between items-center px-4 py-2.5 rounded-lg cursor-pointer group transition-all mb-1 ${isSelected ? 'bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold shadow-sm' : 'hover:bg-slate-100 border border-transparent text-slate-700'}`;
+                
+                // Check if this week has any assigned schedules
+                const hasSchedules = Object.keys(state.schedules).some(key => key.startsWith(`w${w}_`) && state.schedules[key].dept1);
+                const checkIcon = hasSchedules ? `<i class="fa-solid fa-circle-check text-emerald-500 text-xs ml-2" title="Đã có lịch"></i>` : '';
+
+                div.innerHTML = `
+                    <div class="flex-1 flex items-center" onclick="selectWeek(${w})">
+                        <div class="${isSelected ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-200 text-slate-500'} w-7 h-7 rounded flex items-center justify-center mr-3 text-sm transition-colors">
+                            <i class="fa-solid fa-calendar-week"></i>
+                        </div>
+                        Tuần ${w} ${checkIcon}
+                    </div>
+                    <button onclick="removeWeek(event, ${w})" class="text-slate-400 hover:text-red-500 hover:bg-red-50 rounded p-1.5 opacity-0 group-hover:opacity-100 transition-all" title="Xóa tuần này">
+                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    </button>
+                `;
+                elWeeksList.appendChild(div);
+            });
+        };
+
+        window.selectWeek = function(w) {
+            if(state.isAnimating) return;
+            state.selectedWeek = w;
+            renderWeeks(); // Update active highlights
+            
+            document.getElementById('btn-add-days').classList.remove('hidden');
+            document.getElementById('btn-add-days').classList.add('flex');
+            
+            elCenterTitle.innerHTML = `Lịch Trực Bán Trú - <span class="text-indigo-600">Tuần ${w}</span>`;
+            
+            // Force full render first time switching week
+            currentRenderHash = ""; 
+            smartRenderDays();
+            renderRightSummary();
+        };
+
+        function smartRenderDays() {
+            const week = state.selectedWeek;
+            if(!week) return;
+            
+            let activeDays = DAYS_OF_WEEK.filter(d => state.schedules[`w${week}_d${d.id}`] !== undefined);
+            
+            // 1. Tạo một Hash string để kiểm tra xem Cấu trúc thẻ (số lượng thẻ, tổ được chia) có thay đổi không
+            const newHash = activeDays.map(d => {
+                const s = state.schedules[`w${week}_d${d.id}`];
+                return `${d.id}-${s.dept1}-${s.dept2}`; // Thay đổi cấu trúc khi thêm/xóa ngày hoặc thay đổi tổ
+            }).join('|');
+            
+            if (activeDays.length === 0) {
+                elDaysContainer.classList.add('hidden');
+                elEmptyState.classList.remove('hidden');
+                document.getElementById('empty-state-text').innerHTML = `Tuần ${week} chưa có ngày trực nào.<br>Bấm nút <b>"+ Thêm ngày trực"</b> ở góc trên.`;
+                currentRenderHash = "";
+                return;
+            }
+
+            elEmptyState.classList.add('hidden');
+            elDaysContainer.classList.remove('hidden');
+
+            // 2. Nếu Cấu trúc thay đổi -> Vẽ lại toàn bộ HTML (Full Render)
+            if (newHash !== currentRenderHash) {
+                elDaysContainer.innerHTML = '';
+                
+                // Khởi tạo tùy chọn danh sách tổ cho menu dropdown phân công thủ công
+                const deptOptions = `<option value="">-- Chọn Tổ trực --</option>` + DEPARTMENTS.map(d => `<option value="${d}">${d}</option>`).join('');
+                
+                activeDays.forEach(dayInfo => {
+                    const s = state.schedules[`w${week}_d${dayInfo.id}`];
+                    const card = document.createElement('div');
+                    
+                    if (s.dept1) {
+                        // Trạng thái đã phân công: Hiển thị Thẻ có Dropdown chọn giáo viên
+                        card.className = "bg-white rounded-xl shadow-sm border border-slate-200 overflow-visible flex flex-col hover:shadow-md transition-shadow";
+                        card.innerHTML = `
+                            <div class="px-4 py-3 border-b border-slate-100 flex justify-between items-center rounded-t-xl bg-gradient-to-r from-indigo-600 to-indigo-500">
+                                <div class="flex items-center gap-2">
+                                    <div class="bg-white/20 rounded-lg w-7 h-7 flex items-center justify-center">
+                                        <i class="fa-regular fa-calendar text-white text-xs"></i>
+                                    </div>
+                                    <h3 class="font-bold text-white">${dayInfo.name}</h3>
+                                </div>
+                                <button onclick="clearDayAssignment(${week}, ${dayInfo.id})" class="text-indigo-200 hover:text-white hover:bg-white/20 px-2.5 py-1 text-xs font-medium rounded-md transition-colors flex items-center gap-1" title="Làm mới phân công">
+                                    <i class="fa-solid fa-rotate-left"></i> Làm mới
+                                </button>
+                            </div>
+                            <div class="p-4 flex-1 space-y-3">
+                                <!-- Nhập GV Tổ 1 -->
+                                <div class="relative rounded-lg border border-indigo-100 overflow-visible">
+                                    <div class="flex items-center gap-2 px-3 py-2 bg-indigo-50 border-b border-indigo-100">
+                                        <span class="w-5 h-5 rounded-full bg-indigo-600 text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">1</span>
+                                        <h4 class="font-semibold text-indigo-700 text-xs flex-1 truncate">${s.dept1}</h4>
+                                        <span class="text-[10px] text-indigo-400 bg-indigo-100 px-1.5 py-0.5 rounded font-medium">${DEPT_SIZES[s.dept1]} GV</span>
+                                    </div>
+                                    <div class="relative p-2">
+                                        <div class="relative flex items-center">
+                                            <i class="fa-solid fa-magnifying-glass absolute left-2.5 text-slate-400 text-xs pointer-events-none"></i>
+                                            <input type="text" id="input-${week}-${dayInfo.id}-1" value="${s.t1 || ''}" data-dept="${s.dept1}" autocomplete="off" placeholder="Tìm giáo viên trực..." class="w-full border border-slate-200 rounded-md pl-7 pr-3 py-2 text-sm focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all bg-white" onkeyup="filterTeachers(this, ${week}, ${dayInfo.id}, 1)" onclick="toggleDropdown(this, true)" onblur="handleInputBlur(this, ${week}, ${dayInfo.id})">
+                                        </div>
+                                        <div id="dropdown-${week}-${dayInfo.id}-1" class="custom-dropdown-content"></div>
+                                    </div>
+                                </div>
+                                <!-- Nhập GV Tổ 2 -->
+                                <div class="relative rounded-lg border border-pink-100 overflow-visible">
+                                    <div class="flex items-center gap-2 px-3 py-2 bg-pink-50 border-b border-pink-100">
+                                        <span class="w-5 h-5 rounded-full bg-pink-500 text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">2</span>
+                                        <h4 class="font-semibold text-pink-600 text-xs flex-1 truncate">${s.dept2}</h4>
+                                        <span class="text-[10px] text-pink-400 bg-pink-100 px-1.5 py-0.5 rounded font-medium">${DEPT_SIZES[s.dept2]} GV</span>
+                                    </div>
+                                    <div class="relative p-2">
+                                        <div class="relative flex items-center">
+                                            <i class="fa-solid fa-magnifying-glass absolute left-2.5 text-slate-400 text-xs pointer-events-none"></i>
+                                            <input type="text" id="input-${week}-${dayInfo.id}-2" value="${s.t2 || ''}" data-dept="${s.dept2}" autocomplete="off" placeholder="Tìm giáo viên trực..." class="w-full border border-slate-200 rounded-md pl-7 pr-3 py-2 text-sm focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 transition-all bg-white" onkeyup="filterTeachers(this, ${week}, ${dayInfo.id}, 2)" onclick="toggleDropdown(this, true)" onblur="handleInputBlur(this, ${week}, ${dayInfo.id})">
+                                        </div>
+                                        <div id="dropdown-${week}-${dayInfo.id}-2" class="custom-dropdown-content"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Báo cáo kết quả trực -->
+                                <div class="mt-2 rounded-xl border border-emerald-200 bg-emerald-50/60 overflow-hidden">
+                                    <div class="flex items-center justify-between px-3 py-2 bg-emerald-100/70 border-b border-emerald-200">
+                                        <h4 class="font-semibold text-emerald-800 text-xs flex items-center gap-1.5 uppercase tracking-wide">
+                                            <i class="fa-solid fa-clipboard-check text-emerald-600"></i>Báo cáo kết quả trực
+                                        </h4>
+                                        <span id="report-status-${week}-${dayInfo.id}" class="text-[11px] font-medium px-2 py-0.5 rounded-full transition-all ${s.report ? 'bg-emerald-200 text-emerald-800' : 'bg-slate-200 text-slate-500'}">
+                                            ${s.report ? '<i class="fa-solid fa-circle-check mr-1"></i>Đã có báo cáo' : 'Chưa nhập'}
+                                        </span>
+                                    </div>
+                                    <div class="p-2.5">
+                                        <textarea id="report-${week}-${dayInfo.id}"
+                                                  class="w-full text-sm border border-emerald-200 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-emerald-500 transition-all resize-none bg-white min-h-[72px] placeholder-slate-400 leading-relaxed"
+                                                  placeholder="Nhập tình hình nề nếp, số học sinh, sự cố (nếu có)..."
+                                                  oninput="onReportInput(this, ${week}, ${dayInfo.id})"
+                                                  onblur="autoSaveReport(${week}, ${dayInfo.id})">${s.report || ''}</textarea>
+                                        <div class="flex items-center justify-between mt-2">
+                                            <span id="report-charcount-${week}-${dayInfo.id}" class="text-[11px] text-slate-400">${s.report ? s.report.length + ' ký tự' : ''}</span>
+                                            <button onclick="saveReportNow(${week}, ${dayInfo.id})"
+                                                    id="report-btn-${week}-${dayInfo.id}"
+                                                    class="hidden text-xs font-semibold px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm flex items-center gap-1.5">
+                                                <i class="fa-solid fa-floppy-disk"></i> Lưu báo cáo
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        // Khởi tạo danh sách xổ xuống ngay lập tức
+                        setTimeout(() => {
+                            buildDropdown(week, dayInfo.id, 1);
+                            buildDropdown(week, dayInfo.id, 2);
+                        }, 0);
+                    } else {
+                        // Trạng thái chờ phân công - Đã thêm tính năng CHỌN THỦ CÔNG
+                        card.className = "bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col hover:shadow-md transition-shadow relative";
+                        card.innerHTML = `
+                            <div class="bg-slate-50 px-4 py-3 border-b border-slate-100 flex justify-between items-center rounded-t-xl">
+                                <h3 class="font-bold text-slate-700">${dayInfo.name}</h3>
+                                <button onclick="removeDay(event, ${week}, ${dayInfo.id})" class="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1 rounded transition-colors" title="Xóa ngày này"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                            <div class="p-5 flex-1 flex flex-col gap-4 min-h-[250px]">
+                                <button onclick="startRandomizer(${week}, ${dayInfo.id})" class="bg-indigo-50 border border-indigo-200 hover:border-indigo-400 hover:bg-indigo-100 text-indigo-700 font-semibold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2 shadow-sm">
+                                    <i class="fa-solid fa-shuffle"></i> Phân công ngẫu nhiên
+                                </button>
+                                
+                                <div class="flex items-center">
+                                    <div class="flex-grow border-t border-slate-200"></div>
+                                    <span class="flex-shrink-0 mx-3 text-slate-400 text-[11px] uppercase font-bold tracking-wider">Hoặc chọn thủ công</span>
+                                    <div class="flex-grow border-t border-slate-200"></div>
+                                </div>
+                                
+                                <div class="space-y-2.5 flex-1 flex flex-col justify-end">
+                                    <select id="manual-dept1-${week}-${dayInfo.id}" class="w-full text-sm border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white">
+                                        ${deptOptions}
+                                    </select>
+                                    <select id="manual-dept2-${week}-${dayInfo.id}" class="w-full text-sm border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 bg-white">
+                                        ${deptOptions}
+                                    </select>
+                                    <button onclick="manualAssign(${week}, ${dayInfo.id})" class="w-full mt-1 bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-4 rounded-md transition-colors text-sm shadow-sm">
+                                        <i class="fa-solid fa-check mr-1.5"></i> Xác nhận chọn
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    elDaysContainer.appendChild(card);
+                });
+                
+                currentRenderHash = newHash; // Cập nhật hash mới
+            } 
+            // 3. Nếu Cấu trúc KHÔNG đổi (chỉ là dữ liệu GV thay đổi từ Firebase) -> Cập nhật mềm (Soft Update)
+            else {
+                activeDays.forEach(dayInfo => {
+                    const s = state.schedules[`w${week}_d${dayInfo.id}`];
+                    if(s && s.dept1) {
+                        const i1 = document.getElementById(`input-${week}-${dayInfo.id}-1`);
+                        const i2 = document.getElementById(`input-${week}-${dayInfo.id}-2`);
+                        const rpt = document.getElementById(`report-${week}-${dayInfo.id}`);
+                        
+                        // Chỉ đè dữ liệu nếu thẻ input đó ĐANG KHÔNG ĐƯỢC FOCUS (nghĩa là người dùng không gõ)
+                        if (i1 && document.activeElement !== i1) i1.value = s.t1 || '';
+                        if (i2 && document.activeElement !== i2) i2.value = s.t2 || '';
+                        if (rpt && document.activeElement !== rpt) {
+                            rpt.value = s.report || '';
+                            updateReportStatusBadge(week, dayInfo.id, s.report || '');
+                        }
+                    }
+                });
+            }
+        }
+
+        window.renderRightSummary = function() {
+            const week = state.selectedWeek;
+            if (!week) return;
+
+            document.getElementById('right-panel-week-badge').innerText = `Tuần ${week}`;
+            elWeeklySummary.innerHTML = '';
+
+            let hasAssignedDays = false;
+
+            DAYS_OF_WEEK.forEach(day => {
+                const docId = `w${week}_d${day.id}`;
+                const sched = state.schedules[docId];
+                
+                if (sched && sched.dept1) {
+                    hasAssignedDays = true;
+                    const div = document.createElement('div');
+                    div.className = "bg-white border border-slate-200 rounded-lg p-3 shadow-sm hover:border-indigo-300 transition-colors";
+                    
+                    const gv1 = sched.t1 ? `<span class="font-semibold text-indigo-700">${sched.t1}</span>` : '<span class="text-slate-400 italic text-xs">Chưa nhập</span>';
+                    const gv2 = sched.t2 ? `<span class="font-semibold text-pink-700">${sched.t2}</span>` : '<span class="text-slate-400 italic text-xs">Chưa nhập</span>';
+                    const reportSection = sched.report 
+                        ? `<div class="mt-2 pt-2 border-t border-slate-100">
+                               <div class="flex items-start gap-1.5">
+                                   <i class="fa-solid fa-clipboard-check text-emerald-500 text-xs mt-0.5 flex-shrink-0"></i>
+                                   <p class="text-[12px] text-emerald-800 leading-relaxed line-clamp-2 italic">"${sched.report}"</p>
+                               </div>
+                           </div>` 
+                        : `<div class="mt-2 pt-2 border-t border-slate-100">
+                               <span class="text-[11px] text-slate-400 flex items-center gap-1"><i class="fa-regular fa-file-lines text-slate-300"></i>Chưa có báo cáo</span>
+                           </div>`;
+                    
+                    div.innerHTML = `
+                        <div class="flex items-center gap-2 border-b border-slate-100 pb-2 mb-2">
+                            <div class="bg-indigo-600 text-white rounded px-1.5 py-0.5 text-[10px] font-bold">${day.name.replace('Thứ ', 'T')}</div>
+                            <h4 class="font-bold text-slate-800 text-sm">${day.name}</h4>
+                            ${sched.report ? '<span class="ml-auto bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 rounded-full font-semibold border border-emerald-200">✓ Báo cáo</span>' : ''}
+                        </div>
+                        <div class="space-y-1.5 text-[12px]">
+                            <div class="flex items-center gap-2 bg-indigo-50 p-1.5 rounded-md">
+                                <span class="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0"></span>
+                                <span class="text-slate-500 truncate" title="${sched.dept1}">${sched.dept1}:</span>
+                                <span class="text-right flex-1 truncate font-medium">${gv1}</span>
+                            </div>
+                            <div class="flex items-center gap-2 bg-pink-50 p-1.5 rounded-md">
+                                <span class="w-2 h-2 rounded-full bg-pink-400 flex-shrink-0"></span>
+                                <span class="text-slate-500 truncate" title="${sched.dept2}">${sched.dept2}:</span>
+                                <span class="text-right flex-1 truncate font-medium">${gv2}</span>
+                            </div>
+                        </div>
+                        ${reportSection}
+                    `;
+                    elWeeklySummary.appendChild(div);
+                }
+            });
+
+            if (!hasAssignedDays) {
+                elWeeklySummary.innerHTML = `
+                    <div class="flex flex-col items-center justify-center text-slate-400 text-center h-full mt-10">
+                        <i class="fa-regular fa-calendar-xmark text-4xl mb-3 text-slate-200"></i>
+                        <p class="text-sm">Chưa có tổ nào được phân công<br>trong tuần này.</p>
+                    </div>
+                `;
+            }
+        }
+
+        window.openAddDaysModal = function() {
+            if(!state.selectedWeek) return;
+            
+            const container = document.getElementById('days-checkbox-container');
+            container.innerHTML = '';
+            
+            DAYS_OF_WEEK.forEach(day => {
+                const docId = `w${state.selectedWeek}_d${day.id}`;
+                const isChecked = state.schedules[docId] !== undefined;
+                
+                const label = document.createElement('label');
+                label.className = `flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${isChecked ? 'bg-blue-50 border-blue-300' : 'hover:bg-slate-50 border-slate-200'}`;
+                label.innerHTML = `
+                    <input type="checkbox" value="${day.id}" ${isChecked ? 'checked disabled' : ''} class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                    <span class="ml-3 font-medium ${isChecked ? 'text-blue-800' : 'text-slate-700'}">${day.name} ${isChecked ? '<span class="text-xs text-blue-500 font-normal ml-1">(Đã thêm)</span>' : ''}</span>
+                `;
+                
+                const input = label.querySelector('input');
+                if(!input.disabled) {
+                    input.addEventListener('change', (e) => {
+                        if(e.target.checked) label.classList.add('bg-blue-50', 'border-blue-300');
+                        else label.classList.remove('bg-blue-50', 'border-blue-300');
+                    });
+                }
+                container.appendChild(label);
+            });
+            
+            const modal = document.getElementById('add-days-modal');
+            const content = document.getElementById('add-days-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        };
+
+        window.closeAddDaysModal = function() {
+            const modal = document.getElementById('add-days-modal');
+            const content = document.getElementById('add-days-content');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 200);
+        };
+
+        window.saveActiveDays = function() {
+            const week = state.selectedWeek;
+            if(!week) return;
+            
+            const checkboxes = document.querySelectorAll('#days-checkbox-container input[type="checkbox"]:checked:not(:disabled)');
+            let addedCount = 0;
+            
+            // Đóng Modal ngay lập tức để người dùng không bị kẹt (Treo UI)
+            closeAddDaysModal();
+            
+            for (const cb of checkboxes) {
+                const dayId = parseInt(cb.value);
+                const docId = `w${week}_d${dayId}`;
+                
+                // Khởi tạo dữ liệu Thẻ trống (chưa có tổ)
+                const newDocData = {
+                    week: week,
+                    dayId: dayId,
+                    dept1: "", dept2: "", t1: "", t2: "", report: "",
+                    timestamp: new Date().getTime()
+                };
+
+                if(db) {
+                    // Chạy ngầm việc lưu (không dùng await)
+                    setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'schedules', docId), newDocData)
+                        .catch(e => showToast("Lỗi lưu ngày: " + e.message, "error"));
+                } else {
+                    state.schedules[docId] = newDocData; // Lưu cục bộ
+                }
+                addedCount++;
+            }
+            
+            if(addedCount > 0) {
+                showToast(`Đã tạo thẻ cho ${addedCount} ngày trực!`);
+                if(!db) { smartRenderDays(); renderWeeks(); } // Cập nhật local nếu offline
+            }
+        };
+
+        window.removeDay = function(e, week, dayId) {
+            e.stopPropagation();
+            const docId = `w${week}_d${dayId}`;
+            
+            showConfirmModal("Xóa Ngày Trực", `Bạn có chắc muốn xóa thẻ phân công của <b>Ngày thứ ${dayId}</b> khỏi tuần này không?`, () => {
+                if(db) {
+                    deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'schedules', docId))
+                        .then(() => showToast("Đã xóa ngày trực thành công!"))
+                        .catch(e => showModal("Lỗi", "Không thể xóa: " + e.message));
+                } else {
+                    delete state.schedules[docId];
+                    smartRenderDays();
+                    renderWeeks();
+                    showToast("Đã xóa (Cục bộ)!");
+                }
+            });
+        };
+
+        window.clearDayAssignment = async function(week, dayId) {
+            const docId = `w${week}_d${dayId}`;
+            
+            showConfirmModal("Làm mới kết quả trực", "Bạn có chắc muốn hủy kết quả phân công tổ này? Thẻ ngày trực vẫn được giữ lại để bạn phân công lại.", async () => {
+                const emptyData = {
+                    week: week, dayId: dayId,
+                    dept1: "", dept2: "", t1: "", t2: "", report: "",
+                    timestamp: new Date().getTime()
+                };
+
+                if(db) {
+                    setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'schedules', docId), emptyData)
+                        .then(() => showToast("Đã làm mới, sẵn sàng phân công lại!"))
+                        .catch(e => showModal("Lỗi", "Không thể làm mới: " + e.message));
+                } else {
+                    state.schedules[docId] = emptyData;
+                    smartRenderDays();
+                    renderRightSummary();
+                    calculateStats();
+                }
+            });
+        };
+
+        window.manualAssign = function(week, dayId) {
+            const d1 = document.getElementById(`manual-dept1-${week}-${dayId}`).value;
+            const d2 = document.getElementById(`manual-dept2-${week}-${dayId}`).value;
+            
+            if (!d1 || !d2) {
+                showToast("Vui lòng chọn đủ 2 tổ!", "warning");
+                return;
+            }
+            if (d1 === d2) {
+                showToast("Hai tổ trực phải khác nhau!", "warning");
+                return;
+            }
+            
+            const newData = {
+                week: week, dayId: dayId,
+                dept1: d1, dept2: d2,
+                t1: "", t2: "", report: "",
+                timestamp: new Date().getTime()
+            };
+            
+            if(db) {
+                setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'schedules', `w${week}_d${dayId}`), newData)
+                    .catch(e => showToast("Lỗi lưu dữ liệu: " + e.message, "error"));
+            } else {
+                state.schedules[`w${week}_d${dayId}`] = newData;
+                smartRenderDays(); renderRightSummary(); calculateStats();
+            }
+        };
+
+        window.startRandomizer = function(week, dayId) {
+            if(state.isAnimating) return;
+            
+            // 1. TÌM CÁC TỔ HỢP LỆ (Không trực liên tiếp)
+            let ineligible = new Set();
+            
+            // Tìm ngày trước đó
+            let prevDayId = dayId - 1; let prevWeek = week;
+            if (prevDayId < 2) { prevDayId = 8; prevWeek--; }
+            
+            // Tìm ngày sau đó
+            let nextDayId = dayId + 1; let nextWeek = week;
+            if (nextDayId > 8) { nextDayId = 2; nextWeek++; }
+
+            const prevDoc = state.schedules[`w${prevWeek}_d${prevDayId}`];
+            if (prevDoc && prevDoc.dept1) { ineligible.add(prevDoc.dept1); ineligible.add(prevDoc.dept2); }
+            
+            const nextDoc = state.schedules[`w${nextWeek}_d${nextDayId}`];
+            if (nextDoc && nextDoc.dept1) { ineligible.add(nextDoc.dept1); ineligible.add(nextDoc.dept2); }
+
+            let eligibleDepts = DEPARTMENTS.filter(d => !ineligible.has(d));
+            
+            if (eligibleDepts.length < 2) {
+                showToast("Luật khắt khe: Phải mượn tạm tổ đã trực sát ngày.", "warning");
+                eligibleDepts = [...DEPARTMENTS]; // Fallback to all if rules are too strict
+            }
+
+            // 2. CÂN BẰNG TẢI DỰA TRÊN TỶ LỆ: (Số buổi đã trực) / (Số lượng giáo viên trong tổ)
+            // Tổ nào có tỷ lệ này càng thấp (nghĩa là số buổi trực ít so với sĩ số đông) sẽ được đẩy lên đầu để ưu tiên chọn.
+            eligibleDepts.sort((a, b) => {
+                 const countA = state.deptStats[a] || 0;
+                 const sizeA = DEPT_SIZES[a] || 1; // Ngăn chia cho 0
+                 const ratioA = countA / sizeA;
+
+                 const countB = state.deptStats[b] || 0;
+                 const sizeB = DEPT_SIZES[b] || 1;
+                 const ratioB = countB / sizeB;
+                 
+                 return ratioA - ratioB; // Sắp xếp tăng dần (Tỷ lệ thấp xếp trên)
+            });
+            
+            // Lấy 4 tổ đứng đầu (tỷ lệ trực/sĩ số thấp nhất) để cho vào vòng quay ngẫu nhiên
+            let pool = [];
+            for(let i = 0; i < Math.min(4, eligibleDepts.length); i++) { pool.push(eligibleDepts[i]); }
+            
+            // Xáo trộn ngẫu nhiên Pool 4 tổ này
+            pool.sort(() => 0.5 - Math.random());
+            
+            const selected1 = pool[0];
+            const selected2 = pool[1] || eligibleDepts[1]; // Fallback if pool is somehow too small
+
+            // 3. HIỆU ỨNG QUAY SỐ (ANIMATION)
+            state.isAnimating = true;
+            elRandomizer.classList.remove('hidden');
+            elRandomizer.classList.add('flex');
+            
+            const elSlot1 = document.getElementById('slot-1');
+            const elSlot2 = document.getElementById('slot-2');
+            
+            elSlot1.classList.add('slot-machine-text');
+            elSlot2.classList.add('slot-machine-text');
+
+            let spinInterval = setInterval(() => {
+                elSlot1.innerText = DEPARTMENTS[Math.floor(Math.random() * DEPARTMENTS.length)];
+                elSlot2.innerText = DEPARTMENTS[Math.floor(Math.random() * DEPARTMENTS.length)];
+            }, 80);
+
+            // Dừng sau 4.5 giây
+            setTimeout(() => {
+                clearInterval(spinInterval);
+                elSlot1.classList.remove('slot-machine-text');
+                elSlot2.classList.remove('slot-machine-text');
+                
+                // Hiển thị kết quả thật
+                elSlot1.innerText = selected1;
+                elSlot2.innerText = selected2;
+                
+                // Bouncing effect
+                elSlot1.parentElement.classList.add('scale-110', 'border-white', 'shadow-2xl');
+                elSlot2.parentElement.classList.add('scale-110', 'border-white', 'shadow-2xl');
+                setTimeout(() => {
+                    elSlot1.parentElement.classList.remove('scale-110', 'border-white');
+                    elSlot2.parentElement.classList.remove('scale-110', 'border-white');
+                }, 400);
+
+                // Chờ thêm 1.5s để người dùng xem kết quả rồi đóng
+                setTimeout(() => {
+                    // ĐÓNG OVERLAY NGAY LẬP TỨC để tránh treo màn hình
+                    elRandomizer.classList.add('hidden');
+                    elRandomizer.classList.remove('flex');
+                    state.isAnimating = false;
+                    
+                    const newData = {
+                        week: week, dayId: dayId,
+                        dept1: selected1, dept2: selected2,
+                        t1: "", t2: "", report: "",
+                        timestamp: new Date().getTime()
+                    };
+                    
+                    if(db) {
+                        // Chạy ngầm tiến trình lưu Firebase
+                        setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'schedules', `w${week}_d${dayId}`), newData)
+                            .catch(e => showToast("Lỗi lưu dữ liệu: " + e.message, "error"));
+                    } else {
+                        state.schedules[`w${week}_d${dayId}`] = newData;
+                        smartRenderDays(); renderRightSummary(); calculateStats();
+                    }
+
+                }, 1500);
+
+            }, 4500);
+        };
+
+        window.buildDropdown = function(week, dayId, slotIndex) {
+            const inputId = `input-${week}-${dayId}-${slotIndex}`;
+            const dropdownId = `dropdown-${week}-${dayId}-${slotIndex}`;
+            
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            if(!input || !dropdown) return;
+
+            const dept = input.dataset.dept;
+            const deptTeachers = RAW_TEACHERS.filter(t => t.dept === dept);
+            
+            dropdown.innerHTML = '';
+            if(deptTeachers.length === 0) {
+                 dropdown.innerHTML = '<div class="p-3 text-sm text-slate-500 italic text-center">Không có danh sách GV</div>';
+                 return;
+            }
+
+            deptTeachers.forEach(t => {
+                const a = document.createElement('a');
+                a.innerText = t.name;
+                
+                // Dùng mousedown vì nó kích hoạt TRƯỚC onblur của input
+                a.onmousedown = function(e) {
+                    e.preventDefault(); 
+                    input.value = t.name;
+                    dropdown.classList.remove('show-dropdown');
+                    autoSaveTeacher(week, dayId); // Lưu ngay
+                };
+                dropdown.appendChild(a);
+            });
+        };
+
+        window.filterTeachers = function(inputEl, week, dayId, slotIndex) {
+            const filter = inputEl.value.toUpperCase();
+            const dropdown = document.getElementById(`dropdown-${week}-${dayId}-${slotIndex}`);
+            const a = dropdown.getElementsByTagName("a");
+            
+            let hasVisible = false;
+            for (let i = 0; i < a.length; i++) {
+                let txtValue = a[i].textContent || a[i].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    a[i].style.display = "";
+                    hasVisible = true;
+                } else {
+                    a[i].style.display = "none";
+                }
+            }
+            
+            if(filter.length > 0) dropdown.classList.add('show-dropdown');
+        };
+
+        window.toggleDropdown = function(inputEl, show) {
+            const dropdown = inputEl.nextElementSibling;
+            
+            // Đóng tất cả dropdown khác
+            document.querySelectorAll('.custom-dropdown-content').forEach(el => {
+                if(el !== dropdown) el.classList.remove('show-dropdown');
+            });
+            
+            if (show) dropdown.classList.add('show-dropdown');
+            else dropdown.classList.remove('show-dropdown');
+        };
+
+        window.handleInputBlur = function(inputEl, week, dayId) {
+            setTimeout(() => {
+                toggleDropdown(inputEl, false);
+                autoSaveTeacher(week, dayId);
+            }, 150);
+        };
+
+        window.autoSaveTeacher = async function(week, dayId) {
+            const docId = `w${week}_d${dayId}`;
+            const i1 = document.getElementById(`input-${week}-${dayId}-1`);
+            const i2 = document.getElementById(`input-${week}-${dayId}-2`);
+            if(!i1 || !i2) return;
+            
+            const t1 = i1.value.trim();
+            const t2 = i2.value.trim();
+            
+            const currentData = state.schedules[docId];
+            if(currentData && (currentData.t1 !== t1 || currentData.t2 !== t2)) {
+                
+                // Update local to prevent snapping back
+                currentData.t1 = t1;
+                currentData.t2 = t2;
+                
+                if(db) {
+                    try {
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'schedules', docId), currentData);
+                        // Cloud syncs silently
+                    } catch (e) { console.error("Lỗi auto save", e); }
+                } else {
+                    renderRightSummary(); // update local UI
+                }
+            }
+        };
+
+        window.onReportInput = function(textarea, week, dayId) {
+            const len = textarea.value.length;
+            const countEl = document.getElementById(`report-charcount-${week}-${dayId}`);
+            const btnEl = document.getElementById(`report-btn-${week}-${dayId}`);
+            
+            if (countEl) countEl.textContent = len > 0 ? `${len} ký tự` : '';
+            
+            // Show save button when content changes
+            if (btnEl) {
+                btnEl.classList.toggle('hidden', false);
+                btnEl.classList.add('flex');
+            }
+            
+            // Update status badge to "Đang nhập..."
+            const statusEl = document.getElementById(`report-status-${week}-${dayId}`);
+            if (statusEl) {
+                statusEl.className = "text-[11px] font-medium px-2 py-0.5 rounded-full transition-all bg-amber-100 text-amber-700";
+                statusEl.innerHTML = '<i class="fa-solid fa-pen-to-square mr-1"></i>Đang nhập...';
+            }
+        };
+
+        window.updateReportStatusBadge = function(week, dayId, reportText) {
+            const statusEl = document.getElementById(`report-status-${week}-${dayId}`);
+            const btnEl = document.getElementById(`report-btn-${week}-${dayId}`);
+            if (statusEl) {
+                if (reportText && reportText.trim().length > 0) {
+                    statusEl.className = "text-[11px] font-medium px-2 py-0.5 rounded-full transition-all bg-emerald-200 text-emerald-800";
+                    statusEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>Đã có báo cáo';
+                } else {
+                    statusEl.className = "text-[11px] font-medium px-2 py-0.5 rounded-full transition-all bg-slate-200 text-slate-500";
+                    statusEl.innerHTML = 'Chưa nhập';
+                }
+            }
+            if (btnEl) btnEl.classList.add('hidden');
+        };
+
+        window.saveReportNow = async function(week, dayId) {
+            await autoSaveReport(week, dayId);
+            updateReportStatusBadge(week, dayId, (state.schedules[`w${week}_d${dayId}`]?.report || ''));
+            showToast("Đã lưu báo cáo thành công!");
+        };
+
+        window.autoSaveReport = async function(week, dayId) {
+            const docId = `w${week}_d${dayId}`;
+            const reportEl = document.getElementById(`report-${week}-${dayId}`);
+            if(!reportEl) return;
+            
+            const report = reportEl.value.trim();
+            const currentData = state.schedules[docId];
+            
+            if(currentData && currentData.report !== report) {
+                currentData.report = report;
+                
+                if(db) {
+                    try {
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'schedules', docId), currentData);
+                        updateReportStatusBadge(week, dayId, report);
+                        renderRightSummary();
+                    } catch (e) { console.error("Lỗi lưu báo cáo", e); }
+                } else {
+                    updateReportStatusBadge(week, dayId, report);
+                    renderRightSummary(); // Update local UI for badge
+                }
+            }
+        };
+
+        // Đóng dropdown khi click ra ngoài
+        document.addEventListener('mousedown', function(event) {
+            if (!event.target.matches('[id^="input-"]') && !event.target.closest('.custom-dropdown-content')) {
+                document.querySelectorAll('.custom-dropdown-content').forEach(el => {
+                    el.classList.remove('show-dropdown');
+                });
+            }
+        });
+
+        function calculateStats() {
+            state.deptStats = {};
+            DEPARTMENTS.forEach(d => state.deptStats[d] = 0);
+            
+            // Chỉ tính cho các ngày ĐÃ ĐƯỢC PHÂN CÔNG (có dept1)
+            Object.values(state.schedules).forEach(sched => {
+                if (sched.dept1 && state.deptStats[sched.dept1] !== undefined) state.deptStats[sched.dept1]++;
+                if (sched.dept2 && state.deptStats[sched.dept2] !== undefined) state.deptStats[sched.dept2]++;
+            });
+            
+            renderStats();
+        }
+
+        function renderStats() {
+            elStatsContainer.innerHTML = '';
+            
+            let statArray = Object.keys(state.deptStats).map(dept => ({
+                dept: dept,
+                count: state.deptStats[dept],
+                size: DEPT_SIZES[dept]
+            })).sort((a, b) => b.count - a.count);
+
+            statArray.forEach((item, index) => {
+                // Top 3 gets special highlight
+                const isTop = item.count > 0 && index < 3;
+                const div = document.createElement('div');
+                div.className = "bg-white p-3 rounded-lg border border-slate-100 flex justify-between items-center shadow-sm hover:shadow transition-shadow";
+                div.innerHTML = `
+                    <div class="flex flex-col pr-2 overflow-hidden">
+                        <span class="font-medium ${isTop ? 'text-indigo-700 font-semibold' : 'text-slate-600'} text-[13px] truncate flex items-center">
+                            ${isTop ? '<i class="fa-solid fa-fire text-orange-500 mr-2 text-xs"></i>' : '<i class="fa-solid fa-building text-slate-300 mr-2 text-xs"></i>'}
+                            ${item.dept}
+                        </span>
+                        <span class="text-[11px] text-slate-400 mt-0.5 ml-5">Sĩ số: ${item.size} GV</span>
+                    </div>
+                    <span class="font-bold ${isTop ? 'text-white bg-indigo-500 border-indigo-600' : 'text-slate-600 bg-slate-100 border-slate-200'} px-2.5 py-0.5 rounded border text-sm min-w-[2rem] text-center" title="Số buổi trực">${item.count}</span>
+                `;
+                elStatsContainer.appendChild(div);
+            });
+        }
+
+        window.addWeek = function() {
+            const input = document.getElementById('new-week-input');
+            const val = parseInt(input.value);
+            if (isNaN(val) || val <= 0 || val > 100) { showToast("Nhập số tuần hợp lệ (1-100)!", "error"); return; }
+            if (state.weeks.includes(val)) { showToast("Tuần này đã tồn tại!", "error"); return; }
+            
+            const newWeeks = [...state.weeks, val].sort((a, b) => a - b);
+            input.value = '';
+            
+            if(db) {
+                setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'weeksConfig'), { weeks: newWeeks })
+                    .then(() => showToast("Đã thêm tuần mới!"))
+                    .catch(e => showToast("Lỗi thêm tuần: " + e.message, "error"));
+            } else {
+                state.weeks = newWeeks;
+                renderWeeks();
+            }
+        };
+
+        window.removeWeek = function(e, w) {
+            e.stopPropagation(); 
+            showConfirmModal("Xóa Tuần", `Bạn có chắc muốn xóa <b>Tuần ${w}</b> khỏi danh sách? Lịch trực của tuần này (nếu có) sẽ không bị xóa trong dữ liệu ẩn, nhưng sẽ biến mất khỏi menu.`, () => {
+                const newWeeks = state.weeks.filter(week => week !== w);
+                if(db) {
+                    setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'weeksConfig'), { weeks: newWeeks })
+                        .then(() => showToast("Đã xóa tuần!"))
+                        .catch(e => showToast("Lỗi xóa tuần: " + e.message, "error"));
+                } else {
+                    state.weeks = newWeeks;
+                    if(state.selectedWeek === w) {
+                        state.selectedWeek = null;
+                        elDaysContainer.classList.add('hidden');
+                        elEmptyState.classList.remove('hidden');
+                        elCenterTitle.innerText = "Vui lòng chọn một tuần bên trái";
+                    }
+                    renderWeeks();
+                }
+            });
+        };
+
+        window.exportToExcel = function() {
+            // Lọc ra lịch đã được phân công tổ
+            const assignedSchedules = Object.keys(state.schedules)
+                .filter(key => state.schedules[key].dept1)
+                .reduce((obj, key) => {
+                    obj[key] = state.schedules[key];
+                    return obj;
+                }, {});
+
+            if(Object.keys(assignedSchedules).length === 0) {
+                showModal("Thông báo", "Chưa có dữ liệu lịch trực nào đã được xếp để xuất ra Excel.");
+                return;
+            }
+
+            let data = [];
+            const sortedKeys = Object.keys(assignedSchedules).sort((a, b) => {
+                const aParts = a.replace('w','').replace('d','').split('_').map(Number);
+                const bParts = b.replace('w','').replace('d','').split('_').map(Number);
+                if(aParts[0] !== bParts[0]) return aParts[0] - bParts[0];
+                return aParts[1] - bParts[1];
+            });
+
+            sortedKeys.forEach(key => {
+                const s = assignedSchedules[key];
+                const dayName = DAYS_OF_WEEK.find(d => d.id === s.dayId)?.name || `Thứ ${s.dayId}`;
+                data.push({
+                    "Tuần": `Tuần ${s.week}`,
+                    "Thứ": dayName,
+                    "Tổ Trực 1": s.dept1,
+                    "Giáo viên 1": s.t1 || "",
+                    "Tổ Trực 2": s.dept2,
+                    "Giáo viên 2": s.t2 || "",
+                    "Báo cáo kết quả": s.report || ""
+                });
+            });
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wscols = [ {wch: 10}, {wch: 15}, {wch: 25}, {wch: 25}, {wch: 25}, {wch: 25}, {wch: 45} ];
+            ws['!cols'] = wscols;
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Lịch Trực");
+
+            const dateStr = new Date().toISOString().slice(0,10);
+            XLSX.writeFile(wb, `Lich_Truc_Ban_Tru_${dateStr}.xlsx`);
+        };
+
+        const elModal = document.getElementById('custom-modal');
+        const elModalTitle = document.getElementById('modal-title');
+        const elModalMessage = document.getElementById('modal-message');
+        const elModalActions = document.getElementById('modal-actions');
+        const elModalContent = document.getElementById('modal-content');
+        const elModalIcon = document.getElementById('modal-icon');
+
+        window.showModal = function(title, message) {
+            elModalTitle.innerText = title;
+            elModalMessage.innerHTML = message;
+            elModalIcon.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+            elModalIcon.className = "mr-3 text-2xl text-blue-500";
+            
+            elModalActions.innerHTML = `<button onclick="closeModal()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors shadow-sm">Đóng</button>`;
+            
+            elModal.classList.remove('hidden');
+            setTimeout(() => { elModalContent.classList.remove('scale-95'); elModalContent.classList.add('scale-100'); }, 10);
+        };
+
+        window.showConfirmModal = function(title, message, onConfirm) {
+            elModalTitle.innerText = title;
+            elModalMessage.innerHTML = message;
+            elModalIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+            elModalIcon.className = "mr-3 text-2xl text-amber-500";
+
+            elModalActions.innerHTML = `
+                <button onclick="closeModal()" class="px-5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-md transition-colors">Hủy</button>
+                <button id="confirm-btn" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors shadow-sm">Xác nhận</button>
+            `;
+            
+            document.getElementById('confirm-btn').onclick = () => {
+                closeModal();
+                onConfirm();
+            };
+
+            elModal.classList.remove('hidden');
+            setTimeout(() => { elModalContent.classList.remove('scale-95'); elModalContent.classList.add('scale-100'); }, 10);
+        };
+
+        window.closeModal = function() {
+            elModalContent.classList.remove('scale-100');
+            elModalContent.classList.add('scale-95');
+            setTimeout(() => { elModal.classList.add('hidden'); }, 200);
+        };
+
+        window.showToast = function(msg, type="success") {
+            const toast = document.createElement('div');
+            const color = type === "success" ? "bg-slate-800 text-white" : "bg-amber-100 text-amber-800 border border-amber-200";
+            const icon = type === "success" ? '<i class="fa-solid fa-check-circle text-emerald-400 mr-2 text-lg"></i>' : '<i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2 text-lg"></i>';
+            
+            toast.className = `fixed bottom-8 left-1/2 transform -translate-x-1/2 ${color} px-6 py-3 rounded-full shadow-lg z-50 text-sm font-medium flex items-center transition-all duration-300 translate-y-10 opacity-0`;
+            toast.innerHTML = `${icon} ${msg}`;
+            document.body.appendChild(toast);
+            
+            // Slide up animation
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            });
+            
+            setTimeout(() => { 
+                toast.classList.add('translate-y-10', 'opacity-0'); 
+                setTimeout(() => { document.body.removeChild(toast); }, 300);
+            }, 3000);
+        };
+
+        // ================= Điều khiển Drawer (menu trượt) trên điện thoại/tablet =================
+        window.closeAllDrawers = function() {
+            const left = document.getElementById('left-sidebar');
+            const right = document.getElementById('right-sidebar');
+            if (left) left.classList.add('-translate-x-full');
+            if (right) right.classList.add('translate-x-full');
+            const overlay = document.getElementById('drawer-overlay');
+            if (overlay) overlay.classList.add('hidden');
+        };
+
+        window.toggleLeftSidebar = function() {
+            const left = document.getElementById('left-sidebar');
+            const isOpen = left && !left.classList.contains('-translate-x-full');
+            closeAllDrawers();
+            if (!isOpen && left) {
+                left.classList.remove('-translate-x-full');
+                document.getElementById('drawer-overlay').classList.remove('hidden');
+            }
+        };
+
+        window.toggleRightSidebar = function() {
+            const right = document.getElementById('right-sidebar');
+            const isOpen = right && !right.classList.contains('translate-x-full');
+            closeAllDrawers();
+            if (!isOpen && right) {
+                right.classList.remove('translate-x-full');
+                document.getElementById('drawer-overlay').classList.remove('hidden');
+            }
+        };
+
+        // Tự đóng drawer khi người dùng chọn 1 tuần trên điện thoại/tablet để dễ thao tác tiếp
+        const _origSelectWeek = window.selectWeek;
+        window.selectWeek = function(w) {
+            _origSelectWeek(w);
+            if (window.innerWidth < 1024) closeAllDrawers();
+        };
+
+        // Nếu xoay ngang/đổi kích thước sang máy tính (>= lg), đảm bảo drawer không bị kẹt ở trạng thái ẩn/overlay che màn hình
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 1024) {
+                const overlay = document.getElementById('drawer-overlay');
+                if (overlay) overlay.classList.add('hidden');
+            }
+        });
+
+        // Bootstrap the app
+        window.addEventListener('DOMContentLoaded', initApp);
+
+    </script>
+</body>
+</html>
